@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AgriConnect — SIH26132</title>
+<meta name="description" content="AgriConnect — live mandi price discovery, AI selling recommendations and verified buyer matching for farmers. Built for SIH26132.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f5efdd;
+    --paper-dim: #ece3c9;
+    --ink: #1a160f;
+    --ink-soft: #4a4030;
+    --green: #1f5c3e;
+    --green-deep: #123d29;
+    --green-pale: #dce8dc;
+    --turmeric: #d98f1f;
+    --turmeric-deep: #a36a12;
+    --rust: #a83c28;
+    --line: #b8a87c;
+    --line-soft: rgba(184, 168, 124, 0.4);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #171c17;
+      --paper-dim: #1e241d;
+      --ink: #ece6d4;
+      --ink-soft: #b9b199;
+      --green: #6fbf8f;
+      --green-deep: #a8d8b9;
+      --green-pale: #223229;
+      --turmeric: #eba93f;
+      --turmeric-deep: #f0bc63;
+      --rust: #e07254;
+      --line: #4c5945;
+      --line-soft: rgba(140, 158, 130, 0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #171c17;
+    --paper-dim: #1e241d;
+    --ink: #ece6d4;
+    --ink-soft: #b9b199;
+    --green: #6fbf8f;
+    --green-deep: #a8d8b9;
+    --green-pale: #223229;
+    --turmeric: #eba93f;
+    --turmeric-deep: #f0bc63;
+    --rust: #e07254;
+    --line: #4c5945;
+    --line-soft: rgba(140, 158, 130, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    font-size: 17px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3 { font-family: "Fraunces", Georgia, serif; text-wrap: balance; margin: 0; color: var(--ink); }
+  .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+  a { color: inherit; }
+  img, svg { max-width: 100%; }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 28px; }
+
+  /* ---------- ticker ---------- */
+  .ticker-band {
+    background: var(--ink);
+    color: var(--paper);
+    overflow: hidden;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .ticker-track {
+    display: inline-flex;
+    gap: 48px;
+    padding: 9px 0;
+    animation: scroll-left 32s linear infinite;
+  }
+  @media (prefers-reduced-motion: reduce) { .ticker-track { animation: none; } }
+  .ticker-item { font-family: "IBM Plex Mono", monospace; font-size: 12.5px; letter-spacing: 0.02em; display: inline-flex; gap: 8px; align-items: baseline; opacity: 0.92; }
+  .ticker-item b { color: var(--turmeric); font-weight: 600; }
+  .ticker-item .up { color: #7fd39a; }
+  .ticker-item .down { color: #e28a78; }
+  @keyframes scroll-left { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* ---------- header ---------- */
+  header.site {
+    position: sticky; top: 0; z-index: 40;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 28px; max-width: 1180px; margin: 0 auto; }
+  .brand { display: flex; align-items: center; gap: 10px; font-family: "Fraunces", serif; font-weight: 600; font-size: 21px; letter-spacing: -0.01em; }
+  .brand .mark { width: 30px; height: 30px; flex: none; }
+  .navlinks { display: flex; gap: 30px; font-size: 14.5px; }
+  .navlinks a { text-decoration: none; color: var(--ink-soft); border-bottom: 1px solid transparent; padding-bottom: 2px; transition: color .15s, border-color .15s; }
+  .navlinks a:hover { color: var(--ink); border-color: var(--turmeric); }
+  .navcta { display: flex; align-items: center; gap: 18px; }
+  .btn {
+    font-family: "IBM Plex Sans", sans-serif; font-weight: 600; font-size: 14px; letter-spacing: 0.01em;
+    padding: 10px 20px; border-radius: 2px; cursor: pointer; border: 1px solid transparent; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-solid { background: var(--green); color: var(--paper); }
+  .btn-solid:hover { background: var(--green-deep); }
+  .btn-line { border-color: var(--ink); color: var(--ink); }
+  .btn-line:hover { background: var(--ink); color: var(--paper); }
+  .navmobile { display: none; background: none; border: 1px solid var(--line); border-radius: 2px; padding: 7px 9px; cursor: pointer; color: var(--ink); }
+  .navmobile:focus-visible, .btn:focus-visible, a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 2px solid var(--turmeric); outline-offset: 2px;
+  }
+
+  @media (max-width: 860px) {
+    .nav .navlinks, .nav .navcta .btn-line { display: none; }
+    .navmobile { display: inline-flex; }
+  }
+
+  /* ---------- mobile drawer ---------- */
+  .drawer-backdrop {
+    position: fixed; inset: 0; background: rgba(26, 22, 15, 0.45); z-index: 60;
+    opacity: 0; pointer-events: none; transition: opacity .2s ease;
+  }
+  .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
+  .drawer {
+    position: fixed; top: 0; right: 0; bottom: 0; width: min(300px, 84vw);
+    background: var(--paper); z-index: 61; padding: 20px 24px;
+    transform: translateX(100%); transition: transform .25s ease;
+    display: flex; flex-direction: column; gap: 26px; border-left: 1px solid var(--line-soft);
+  }
+  .drawer.open { transform: translateX(0); }
+  .drawer-top { display: flex; justify-content: space-between; align-items: center; }
+  .drawer-close { background: none; border: 1px solid var(--line); border-radius: 2px; padding: 6px 9px; cursor: pointer; color: var(--ink); }
+  .drawer nav { display: flex; flex-direction: column; gap: 4px; }
+  .drawer nav a { text-decoration: none; color: var(--ink); font-size: 16px; padding: 10px 2px; border-bottom: 1px solid var(--line-soft); }
+  .drawer .drawer-cta { display: flex; flex-direction: column; align-items: stretch; gap: 10px; }
+  .drawer .btn { justify-content: center; }
+
+  /* ---------- modal ---------- */
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(26, 22, 15, 0.5); z-index: 80;
+    display: flex; align-items: center; justify-content: center; padding: 24px;
+    opacity: 0; pointer-events: none; transition: opacity .18s ease;
+  }
+  .modal-backdrop.open { opacity: 1; pointer-events: auto; }
+  .modal {
+    background: var(--paper); border: 1px solid var(--line); border-radius: 3px;
+    max-width: 440px; width: 100%; max-height: 86vh; overflow-y: auto;
+    padding: 30px; position: relative; transform: translateY(10px); transition: transform .18s ease;
+  }
+  .modal-backdrop.open .modal { transform: translateY(0); }
+  .modal-close {
+    position: absolute; top: 16px; right: 16px; background: none; border: 1px solid var(--line);
+    border-radius: 50%; width: 30px; height: 30px; cursor: pointer; color: var(--ink-soft); font-size: 15px; line-height: 1;
+  }
+  .modal-close:hover { color: var(--ink); border-color: var(--ink); }
+  .modal .eyebrow { margin-bottom: 14px; }
+  .modal h3 { font-size: 22px; font-weight: 600; margin-bottom: 8px; }
+  .modal p.modal-sub { color: var(--ink-soft); font-size: 14.5px; margin: 0 0 22px; }
+  .modal .modal-body { font-size: 14.5px; color: var(--ink-soft); line-height: 1.65; }
+  .modal .modal-body h4 { font-family: "IBM Plex Sans", sans-serif; font-size: 14px; color: var(--ink); margin: 18px 0 6px; }
+  .modal .modal-body ul { padding-left: 18px; margin: 6px 0; }
+  .modal .modal-body table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13.5px; }
+  .modal .modal-body td { padding: 7px 0; border-bottom: 1px dashed var(--line-soft); }
+  .modal .modal-body td:last-child { text-align: right; font-family: "IBM Plex Mono", monospace; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  .field label { font-size: 12.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-soft); }
+  .field input, .field select, .field textarea {
+    font-family: "IBM Plex Sans", sans-serif; font-size: 14.5px; padding: 10px 12px;
+    border: 1px solid var(--line); border-radius: 2px; background: var(--paper-dim); color: var(--ink);
+  }
+  .field textarea { resize: vertical; min-height: 78px; }
+  .role-pick { display: flex; gap: 8px; }
+  .role-pick label {
+    flex: 1; text-align: center; border: 1px solid var(--line); border-radius: 2px; padding: 10px 6px;
+    cursor: pointer; font-size: 13px; text-transform: none; letter-spacing: 0; color: var(--ink); font-weight: 500;
+  }
+  .role-pick input { position: absolute; opacity: 0; pointer-events: none; }
+  .role-pick input:checked + span { color: var(--paper); }
+  .role-pick label:has(input:checked) { background: var(--green); border-color: var(--green); color: var(--paper); }
+  .form-note { font-size: 12.5px; color: var(--ink-soft); margin-top: 4px; }
+  .modal .btn { width: 100%; justify-content: center; }
+
+  /* ---------- toast ---------- */
+  .toast-stack {
+    position: fixed; bottom: 20px; right: 20px; z-index: 100;
+    display: flex; flex-direction: column; gap: 10px; max-width: min(340px, calc(100vw - 40px));
+  }
+  .toast {
+    background: var(--ink); color: var(--paper); padding: 13px 16px; border-radius: 2px;
+    font-size: 13.5px; display: flex; align-items: flex-start; gap: 10px; box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+    animation: toast-in .22s ease;
+    border-left: 3px solid var(--turmeric);
+  }
+  @keyframes toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .toast .tmark { color: var(--turmeric); flex: none; }
+
+  /* ---------- hero ---------- */
+  .hero { padding: 76px 0 64px; position: relative; }
+  .hero-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 56px; align-items: center; }
+  @media (max-width: 900px) { .hero-grid { grid-template-columns: 1fr; } }
+
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: "IBM Plex Mono", monospace; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--green-deep); border: 1px solid var(--line); padding: 5px 11px; border-radius: 2px;
+  }
+  .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--turmeric); }
+
+  .hero h1 {
+    font-size: clamp(2.5rem, 5vw, 4.1rem);
+    line-height: 1.03; font-weight: 600; letter-spacing: -0.015em; margin: 22px 0 20px;
+  }
+  .hero h1 em { font-style: normal; color: var(--green); }
+  .hero p.lede { font-size: 18.5px; color: var(--ink-soft); max-width: 46ch; margin-bottom: 32px; }
+  .hero-ctas { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 40px; }
+  .btn-lg { padding: 13px 26px; font-size: 15px; }
+
+  .stat-row { display: flex; gap: 34px; flex-wrap: wrap; border-top: 1px solid var(--line-soft); padding-top: 22px; }
+  .stat b { display: block; font-family: "Fraunces", serif; font-size: 26px; font-weight: 600; color: var(--ink); }
+  .stat span { font-size: 12.5px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.04em; }
+
+  /* ledger board illustration */
+  .board {
+    background: var(--green-deep); border-radius: 3px; padding: 26px;
+    position: relative; overflow: hidden; min-height: 460px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    box-shadow: 0 1px 0 var(--line-soft) inset;
+  }
+  .board::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(0deg, rgba(255,255,255,0.035) 0px, rgba(255,255,255,0.035) 1px, transparent 1px, transparent 34px);
+    pointer-events: none;
+  }
+  .board-head { display: flex; justify-content: space-between; align-items: baseline; color: var(--paper); position: relative; }
+  .board-head .label { font-family: "IBM Plex Mono", monospace; font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.7; }
+  .board-head .place { font-family: "Fraunces", serif; font-size: 17px; }
+
+  .board-rows { position: relative; display: flex; flex-direction: column; gap: 0; margin-top: 18px; }
+  .board-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 13px 0; border-bottom: 1px dashed rgba(245,239,221,0.18); color: var(--paper);
+  }
+  .board-row .crop { font-size: 14.5px; }
+  .board-row .crop small { display: block; color: rgba(245,239,221,0.55); font-size: 11.5px; font-family: "IBM Plex Mono", monospace; margin-top: 2px; }
+  .board-row .price { font-family: "IBM Plex Mono", monospace; font-size: 16px; font-weight: 500; }
+  .board-row .price.hi { color: #8fe0ab; }
+  .board-row .price.mid { color: var(--turmeric); }
+
+  .stamp {
+    position: absolute; right: 20px; bottom: 20px;
+    width: 96px; height: 96px; border: 2px solid var(--turmeric); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    color: var(--turmeric); font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase;
+    transform: rotate(-11deg); opacity: 0.9; line-height: 1.3;
+  }
+
+  /* ---------- section framing ---------- */
+  section { padding: 88px 0; border-top: 1px solid var(--line-soft); }
+  .sec-head { max-width: 640px; margin-bottom: 52px; }
+  .sec-head .eyebrow { margin-bottom: 16px; }
+  .sec-head h2 { font-size: clamp(1.9rem, 3vw, 2.6rem); font-weight: 600; letter-spacing: -0.01em; }
+  .sec-head p { color: var(--ink-soft); font-size: 16.5px; margin-top: 14px; max-width: 52ch; }
+
+  .reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
+
+  /* ---------- features ---------- */
+  .feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line-soft); border: 1px solid var(--line-soft); }
+  @media (max-width: 860px) { .feat-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .feat-grid { grid-template-columns: 1fr; } }
+  .feat-card { background: var(--paper); padding: 30px 26px; }
+  .feat-card .num { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--turmeric-deep); }
+  .feat-card h3 { font-size: 19px; font-weight: 600; margin: 14px 0 9px; }
+  .feat-card p { font-size: 14.5px; color: var(--ink-soft); margin: 0; }
+
+  /* ---------- journey ---------- */
+  .journey-list { border-top: 1px solid var(--line-soft); }
+  .jrow {
+    display: grid; grid-template-columns: 64px 1fr 1.4fr; gap: 28px; align-items: baseline;
+    padding: 22px 0; border-bottom: 1px solid var(--line-soft);
+  }
+  @media (max-width: 700px) { .jrow { grid-template-columns: 40px 1fr; } .jrow .jdesc { grid-column: 2; margin-top: 4px; } }
+  .jrow .jnum { font-family: "Fraunces", serif; font-size: 26px; color: var(--line); font-weight: 500; }
+  .jrow .jtitle { font-family: "Fraunces", serif; font-size: 19px; font-weight: 600; }
+  .jrow .jdesc { color: var(--ink-soft); font-size: 14.5px; }
+  .jrow:hover .jnum { color: var(--turmeric); }
+
+  /* ---------- roles ---------- */
+  .role-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  @media (max-width: 860px) { .role-grid { grid-template-columns: 1fr; } }
+  .role-card { border: 1px solid var(--line); border-radius: 3px; overflow: hidden; }
+  .role-top { padding: 26px; color: var(--paper); position: relative; min-height: 128px; display: flex; flex-direction: column; justify-content: space-between; }
+  .role-top.farmer { background: var(--green); }
+  .role-top.buyer { background: var(--turmeric-deep); }
+  .role-top.admin { background: var(--ink); }
+  .role-top .tag { font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.85; }
+  .role-top h3 { font-size: 21px; color: var(--paper); }
+  .role-body { padding: 22px 26px 26px; background: var(--paper-dim); }
+  .role-body p.tagline { font-size: 14.5px; color: var(--ink-soft); margin: 0 0 16px; }
+  .role-body ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+  .role-body li { font-size: 14px; display: flex; gap: 9px; }
+  .role-body li::before { content: "—"; color: var(--turmeric-deep); flex: none; }
+
+  /* ---------- impact ---------- */
+  .impact { background: var(--green-deep); color: var(--paper); border-top: none; }
+  .impact .sec-head h2, .impact .sec-head p { color: var(--paper); }
+  .impact .sec-head p { opacity: 0.75; }
+  .impact .eyebrow { border-color: rgba(245,239,221,0.35); color: var(--paper); }
+  .impact .eyebrow .dot { background: var(--turmeric); }
+  .impact-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: rgba(245,239,221,0.16); border: 1px solid rgba(245,239,221,0.16); }
+  @media (max-width: 780px) { .impact-grid { grid-template-columns: repeat(2, 1fr); } }
+  .impact-card { background: var(--green-deep); padding: 30px 24px; }
+  .impact-card b { display: block; font-family: "Fraunces", serif; font-size: 40px; font-weight: 600; color: var(--turmeric); }
+  .impact-card span { font-size: 13px; opacity: 0.75; }
+
+  /* ---------- testimonials ---------- */
+  .quote-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  @media (max-width: 860px) { .quote-grid { grid-template-columns: 1fr; } }
+  .quote-card { border: 1px solid var(--line); border-radius: 3px; padding: 26px; position: relative; background: var(--paper-dim); }
+  .quote-card .qmark { font-family: "Fraunces", serif; font-size: 44px; color: var(--line); line-height: 1; display: block; margin-bottom: 8px; }
+  .quote-card p.q { font-size: 15px; color: var(--ink); margin: 0 0 20px; }
+  .quote-who { display: flex; align-items: center; gap: 12px; border-top: 1px dashed var(--line-soft); padding-top: 14px; }
+  .quote-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--green); color: var(--paper); display: flex; align-items: center; justify-content: center; font-family: "Fraunces", serif; font-size: 14px; flex: none; }
+  .quote-who b { display: block; font-size: 14px; }
+  .quote-who span { font-size: 12.5px; color: var(--ink-soft); }
+
+  /* ---------- cta ---------- */
+  .cta-panel {
+    background: var(--ink); color: var(--paper); border-radius: 3px; padding: 64px 48px;
+    text-align: left; position: relative; overflow: hidden;
+  }
+  .cta-panel::after {
+    content: ""; position: absolute; right: -60px; top: -60px; width: 260px; height: 260px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(217,143,31,0.28), transparent 70%);
+  }
+  .cta-panel h2 { color: var(--paper); font-size: clamp(1.8rem, 3vw, 2.4rem); max-width: 22ch; }
+  .cta-panel p { color: rgba(245,239,221,0.7); margin: 16px 0 30px; max-width: 50ch; }
+  .cta-ctas { display: flex; gap: 16px; flex-wrap: wrap; position: relative; }
+  .btn-paper { background: var(--paper); color: var(--ink); }
+  .btn-paper:hover { background: var(--turmeric); color: var(--ink); }
+  .btn-ghost { border: 1px solid rgba(245,239,221,0.4); color: var(--paper); }
+  .btn-ghost:hover { background: rgba(245,239,221,0.12); }
+
+  /* ---------- footer ---------- */
+  footer { border-top: 1px solid var(--line-soft); padding: 56px 0 30px; }
+  .foot-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 32px; }
+  @media (max-width: 700px) { .foot-grid { grid-template-columns: 1fr 1fr; } }
+  .foot-grid h4 { font-family: "IBM Plex Mono", monospace; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 14px; }
+  .foot-grid ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; font-size: 14px; }
+  .foot-grid a { text-decoration: none; color: var(--ink-soft); }
+  .foot-grid a:hover { color: var(--green); }
+  .linklike {
+    background: none; border: none; padding: 0; margin: 0; font: inherit; text-align: left;
+    color: var(--ink-soft); cursor: pointer;
+  }
+  .linklike:hover { color: var(--green); }
+  .foot-brand p { color: var(--ink-soft); font-size: 14px; max-width: 34ch; margin-top: 12px; }
+  .foot-bottom { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-top: 1px solid var(--line-soft); margin-top: 44px; padding-top: 20px; font-size: 12.5px; color: var(--ink-soft); font-family: "IBM Plex Mono", monospace; }
+</style>
+</head>
+<body>
+
+<div class="ticker-band">
+  <div class="ticker-track" id="tickerTrack"></div>
+</div>
+
+<header class="site">
+  <div class="nav">
+    <a href="#top" class="brand">
+      <svg class="mark" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="4" fill="#1F5C3E"/><path d="M15 22V13M15 13C15 9 11 7 8 7C8 12 10 15 15 13Z" stroke="#F5EFDD" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 13C15 9.5 18.5 7.5 22 8C22 12 19.5 14.5 15 13Z" stroke="#F5EFDD" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      AgriConnect
+    </a>
+    <nav class="navlinks">
+      <a href="#features">Platform</a>
+      <a href="#journey">Journey</a>
+      <a href="#roles">For You</a>
+      <a href="#impact">Impact</a>
+      <a href="#voices">Voices</a>
+    </nav>
+    <div class="navcta">
+      <button type="button" class="btn btn-line" data-open-modal="signin" id="signinBtn">Sign in</button>
+      <button type="button" class="btn btn-solid" data-open-modal="list" id="listBtnNav">List Produce</button>
+    </div>
+    <button type="button" class="navmobile" id="drawerToggle" aria-label="Open menu" aria-expanded="false" aria-controls="drawer">
+      <svg width="19" height="19" viewBox="0 0 19 19" fill="none"><path d="M2 5h15M2 9.5h15M2 14h15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="drawer-top">
+    <span class="brand" style="font-size:18px;">AgriConnect</span>
+    <button type="button" class="drawer-close" id="drawerClose" aria-label="Close menu">✕</button>
+  </div>
+  <nav>
+    <a href="#features">Platform</a>
+    <a href="#journey">Journey</a>
+    <a href="#roles">For You</a>
+    <a href="#impact">Impact</a>
+    <a href="#voices">Voices</a>
+  </nav>
+  <div class="drawer-cta">
+    <button type="button" class="btn btn-line" data-open-modal="signin">Sign in</button>
+    <button type="button" class="btn btn-solid" data-open-modal="list">List Produce</button>
+  </div>
+</aside>
+
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal" id="modalBox" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button type="button" class="modal-close" id="modalClose" aria-label="Close">✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack" aria-live="polite"></div>
+
+<main id="top">
+  <section class="hero" style="border-top:none; padding-top:0;">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="eyebrow"><span class="dot"></span> SIH26132 · Market Linkage Platform</span>
+        <h1>Know the price<br>before you <em>sell.</em></h1>
+        <p class="lede">AgriConnect reads live mandi prices, buyer demand and transport cost across every nearby market — then tells a farmer exactly where, when and to whom to sell for the best return.</p>
+        <div class="hero-ctas">
+          <button type="button" class="btn btn-solid btn-lg" data-open-modal="list">List your first lot</button>
+          <a href="#journey" class="btn btn-line btn-lg">See the flow →</a>
+        </div>
+        <div class="stat-row">
+          <div class="stat"><b class="mono">12,400+</b><span>Farmers onboarded</span></div>
+          <div class="stat"><b class="mono">₹42Cr+</b><span>Produce traded</span></div>
+          <div class="stat"><b class="mono">340+</b><span>Verified buyers</span></div>
+        </div>
+      </div>
+
+      <div class="board reveal">
+        <div class="board-head">
+          <span class="label">Today's Board · Indore Mandi</span>
+          <span class="place mono" id="clock"></span>
+        </div>
+        <div class="board-rows">
+          <div class="board-row"><div class="crop">Wheat<small>Grade A · ₹/quintal</small></div><div class="price hi mono">₹2,840</div></div>
+          <div class="board-row"><div class="crop">Soybean<small>Grade A · ₹/quintal</small></div><div class="price mid mono">₹4,150</div></div>
+          <div class="board-row"><div class="crop">Onion<small>Grade B · ₹/quintal</small></div><div class="price mono" style="color:#e28a78">₹1,320</div></div>
+          <div class="board-row"><div class="crop">Cotton<small>Grade A · ₹/quintal</small></div><div class="price hi mono">₹6,780</div></div>
+        </div>
+        <div class="stamp">Verified<br>Best Price<br>Today</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="features">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow"><span class="dot"></span> The Platform</span>
+        <h2>Everything between harvest and payment</h2>
+        <p>Six systems, one flow — price discovery, AI recommendation, buyer matching, contracts, logistics and settlement, all tied to a single lot.</p>
+      </div>
+      <div class="feat-grid reveal">
+        <div class="feat-card"><span class="num mono">01</span><h3>Real-Time Price Board</h3><p>Live prices pulled from multiple mandis, compared instantly so no one sells blind to a middleman's number.</p></div>
+        <div class="feat-card"><span class="num mono">02</span><h3>AI Recommendation</h3><p>Price trend forecasts, a best-sale-window, and a net-return calculator that nets out transport and storage.</p></div>
+        <div class="feat-card"><span class="num mono">03</span><h3>Verified Buyer Network</h3><p>Buyer discovery scored by crop, quantity, quality grade and distance — not just who shouts loudest.</p></div>
+        <div class="feat-card"><span class="num mono">04</span><h3>Digital Contracts</h3><p>Deal terms locked and generated as a digital agreement the moment an offer is accepted.</p></div>
+        <div class="feat-card"><span class="num mono">05</span><h3>Logistics Coordination</h3><p>Compare transporters on cost, route and timing, then book pickup without a phone call.</p></div>
+        <div class="feat-card"><span class="num mono">06</span><h3>Payment & Records</h3><p>Invoice, payment status and a full transaction ledger with digital receipts, end to end.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="journey">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow"><span class="dot"></span> The Flow</span>
+        <h2>From listed crop to cleared payment</h2>
+        <p>One guided sequence carries every lot — no step skipped, no side channel back to a middleman.</p>
+      </div>
+      <div class="journey-list reveal">
+        <div class="jrow"><span class="jnum mono">01</span><span class="jtitle">Add Crop</span><span class="jdesc">Farmer lists crop, quantity, quality grade and harvest date in minutes.</span></div>
+        <div class="jrow"><span class="jnum mono">02</span><span class="jtitle">Market Analysis</span><span class="jdesc">AI compares live prices and demand across every nearby mandi.</span></div>
+        <div class="jrow"><span class="jnum mono">03</span><span class="jtitle">Best Recommendation</span><span class="jdesc">Best market, best buyer, best time to sell — ranked by net return.</span></div>
+        <div class="jrow"><span class="jnum mono">04</span><span class="jtitle">Buyer Matching</span><span class="jdesc">Verified buyers surfaced by crop, quality and location match score.</span></div>
+        <div class="jrow"><span class="jnum mono">05</span><span class="jtitle">Digital Offers</span><span class="jdesc">Offers compared side by side; the farmer accepts the strongest one.</span></div>
+        <div class="jrow"><span class="jnum mono">06</span><span class="jtitle">Deal Confirmation</span><span class="jdesc">Terms locked, a digital contract generated — no paperwork, no ambiguity.</span></div>
+        <div class="jrow"><span class="jnum mono">07</span><span class="jtitle">Logistics</span><span class="jdesc">Best transport option booked, with cost and ETA agreed upfront.</span></div>
+        <div class="jrow"><span class="jnum mono">08</span><span class="jtitle">Delivery & Payment</span><span class="jdesc">Quality verified on arrival, payment tracked until it clears.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="roles">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow"><span class="dot"></span> Built For Everyone</span>
+        <h2>One ledger, three roles</h2>
+        <p>Farmers, buyers and regulators each work from the same records, through a view built for their job.</p>
+      </div>
+      <div class="role-grid reveal">
+        <div class="role-card">
+          <div class="role-top farmer"><span class="tag mono">Sell</span><h3>Farmer / FPO</h3></div>
+          <div class="role-body">
+            <p class="tagline">Sell produce at the best price, with full transparency.</p>
+            <ul><li>Add produce & track lots</li><li>AI price recommendations</li><li>Compare buyer offers</li></ul>
+          </div>
+        </div>
+        <div class="role-card">
+          <div class="role-top buyer"><span class="tag mono">Source</span><h3>Buyer / Processor</h3></div>
+          <div class="role-body">
+            <p class="tagline">Source quality produce reliably and efficiently.</p>
+            <ul><li>Post demand & search lots</li><li>Send digital offers</li><li>Track orders end-to-end</li></ul>
+          </div>
+        </div>
+        <div class="role-card">
+          <div class="role-top admin"><span class="tag mono">Govern</span><h3>Admin / Government</h3></div>
+          <div class="role-body">
+            <p class="tagline">Monitor, regulate, and ensure fair trade at scale.</p>
+            <ul><li>Verify users</li><li>Monitor transactions</li><li>Resolve disputes</li></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="impact" class="impact">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow"><span class="dot"></span> Impact</span>
+        <h2>What the ledger shows so far</h2>
+      </div>
+      <div class="impact-grid reveal">
+        <div class="impact-card"><b class="mono">+18%</b><span>Improved farmer income</span></div>
+        <div class="impact-card"><b class="mono">−22%</b><span>Reduced post-harvest loss</span></div>
+        <div class="impact-card"><b class="mono">3×</b><span>Faster buyer discovery</span></div>
+        <div class="impact-card"><b class="mono">−15%</b><span>Lower transaction cost</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="voices">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow"><span class="dot"></span> Voices</span>
+        <h2>Trusted across the value chain</h2>
+      </div>
+      <div class="quote-grid reveal">
+        <div class="quote-card">
+          <span class="qmark">"</span>
+          <p class="q">Pehle middleman jo price bolta tha wahi lena padta tha. Ab main 3 mandiyon ka price dekh kar best jagah bech sakta hoon.</p>
+          <div class="quote-who"><div class="quote-avatar">R</div><div><b>Ramesh Patil</b><span>Wheat Farmer, Nashik</span></div></div>
+        </div>
+        <div class="quote-card">
+          <span class="qmark">"</span>
+          <p class="q">Buyer matching se humein verified farmers directly milte hain — sourcing time aadha ho gaya.</p>
+          <div class="quote-who"><div class="quote-avatar">S</div><div><b>Sunita Traders</b><span>Onion Procurement, Pune</span></div></div>
+        </div>
+        <div class="quote-card">
+          <span class="qmark">"</span>
+          <p class="q">Transparent transaction records se dispute resolution aur market monitoring dono easy ho gaye.</p>
+          <div class="quote-who"><div class="quote-avatar">D</div><div><b>Dept. of Agriculture</b><span>State Pilot Program</span></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cta">
+    <div class="wrap">
+      <div class="cta-panel reveal">
+        <h2>Ready to sell your next harvest at the right price?</h2>
+        <p>Join farmers, buyers and FPOs already trading through AgriConnect — transparent pricing, verified partners, and a paper trail for every deal.</p>
+        <div class="cta-ctas">
+          <button type="button" class="btn btn-lg btn-paper" data-open-modal="list">Start selling today</button>
+          <button type="button" class="btn btn-lg btn-ghost" data-open-modal="app">Get the app</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a href="#top" class="brand">
+          <svg class="mark" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="4" fill="#1F5C3E"/><path d="M15 22V13M15 13C15 9 11 7 8 7C8 12 10 15 15 13Z" stroke="#F5EFDD" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 13C15 9.5 18.5 7.5 22 8C22 12 19.5 14.5 15 13Z" stroke="#F5EFDD" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          AgriConnect
+        </a>
+        <p>Strengthening market linkages and price discovery for farmers — built for SIH26132.</p>
+      </div>
+      <div><h4>Product</h4><ul><li><a href="#features">Platform</a></li><li><a href="#journey">Journey</a></li><li><a href="#roles">For Buyers</a></li><li><a href="#roles">For Admins</a></li></ul></div>
+      <div><h4>Company</h4><ul>
+        <li><button type="button" class="linklike" data-open-modal="about">About</button></li>
+        <li><button type="button" class="linklike" data-open-modal="sih">SIH26132</button></li>
+        <li><button type="button" class="linklike" data-toast="No open roles right now — check back soon.">Careers</button></li>
+        <li><button type="button" class="linklike" data-open-modal="contact">Contact</button></li>
+      </ul></div>
+      <div><h4>Resources</h4><ul>
+        <li><button type="button" class="linklike" data-open-modal="docs">Docs</button></li>
+        <li><button type="button" class="linklike" data-open-modal="price-index">Mandi Price Index</button></li>
+        <li><button type="button" class="linklike" data-open-modal="contact">Support</button></li>
+      </ul></div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 AGRICONNECT — BUILT FOR SMART INDIA HACKATHON</span>
+      <span>SIH26132 · MARKET LINKAGE &amp; PRICE DISCOVERY</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  var prices = [
+    ["WHEAT · INDORE", "₹2,840", "up"], ["ONION · NASHIK", "₹1,320", "down"],
+    ["SOYBEAN · UJJAIN", "₹4,150", "up"], ["COTTON · AKOLA", "₹6,780", "up"],
+    ["TOMATO · PUNE", "₹1,860", "down"], ["MAIZE · SAGAR", "₹2,110", "up"],
+    ["GRAM · JAIPUR", "₹5,340", "up"], ["MUSTARD · KOTA", "₹5,610", "down"]
+  ];
+  function renderTicker() {
+    var items = prices.map(function (p) {
+      return '<span class="ticker-item">' + p[0] + ' <b>' + p[1] + '</b> <span class="' + p[2] + '">' + (p[2] === "up" ? "▲" : "▼") + '</span></span>';
+    }).join("");
+    document.getElementById("tickerTrack").innerHTML = items + items;
+  }
+  renderTicker();
+
+  function tickClock() {
+    var el = document.getElementById("clock");
+    if (!el) return;
+    var d = new Date();
+    var h = String(d.getHours()).padStart(2, "0"), m = String(d.getMinutes()).padStart(2, "0");
+    el.textContent = h + ":" + m + " IST";
+  }
+  tickClock();
+  setInterval(tickClock, 15000);
+
+  if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches && "IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll(".reveal").forEach(function (el) { io.observe(el); });
+  } else {
+    document.querySelectorAll(".reveal").forEach(function (el) { el.classList.add("in"); });
+  }
+
+  /* ---------- toast ---------- */
+  function toast(msg) {
+    var stack = document.getElementById("toastStack");
+    var el = document.createElement("div");
+    el.className = "toast";
+    el.innerHTML = '<span class="tmark">●</span><span>' + msg + '</span>';
+    stack.appendChild(el);
+    setTimeout(function () {
+      el.style.transition = "opacity .25s ease";
+      el.style.opacity = "0";
+      setTimeout(function () { el.remove(); }, 260);
+    }, 4200);
+  }
+
+  /* ---------- mobile drawer ---------- */
+  var drawer = document.getElementById("drawer");
+  var drawerBackdrop = document.getElementById("drawerBackdrop");
+  var drawerToggle = document.getElementById("drawerToggle");
+  var drawerClose = document.getElementById("drawerClose");
+
+  function openDrawer() {
+    drawer.classList.add("open"); drawerBackdrop.classList.add("open");
+    drawer.setAttribute("aria-hidden", "false");
+    drawerToggle.setAttribute("aria-expanded", "true");
+  }
+  function closeDrawer() {
+    drawer.classList.remove("open"); drawerBackdrop.classList.remove("open");
+    drawer.setAttribute("aria-hidden", "true");
+    drawerToggle.setAttribute("aria-expanded", "false");
+  }
+  drawerToggle.addEventListener("click", function () {
+    drawer.classList.contains("open") ? closeDrawer() : openDrawer();
+  });
+  drawerClose.addEventListener("click", closeDrawer);
+  drawerBackdrop.addEventListener("click", closeDrawer);
+  drawer.querySelectorAll("nav a").forEach(function (a) { a.addEventListener("click", closeDrawer); });
+
+  /* ---------- state ---------- */
+  var state = {
+    user: JSON.parse(localStorage.getItem("ac_user") || "null"),
+    lots: JSON.parse(localStorage.getItem("ac_lots") || "[]")
+  };
+  function saveState() {
+    localStorage.setItem("ac_user", JSON.stringify(state.user));
+    localStorage.setItem("ac_lots", JSON.stringify(state.lots));
+  }
+  function refreshUI() {
+    var signinBtn = document.getElementById("signinBtn");
+    if (signinBtn) signinBtn.textContent = state.user ? state.user.name + " · " + state.user.role : "Sign in";
+    var listBtn = document.getElementById("listBtnNav");
+    if (listBtn) listBtn.textContent = state.lots.length ? "List Produce (" + state.lots.length + ")" : "List Produce";
+  }
+  refreshUI();
+
+  /* ---------- modal content ---------- */
+  var infoModals = {
+    about: {
+      title: "About AgriConnect",
+      sub: "Why we built this",
+      body: '<p>AgriConnect is a farmer-first market linkage platform: it reads live mandi prices, buyer demand and logistics cost, then recommends where and to whom a farmer should sell — replacing guesswork with a single, transparent price board.</p>'
+        + '<h4>Built for</h4><ul><li>Farmers &amp; FPOs selling produce</li><li>Buyers &amp; processors sourcing at scale</li><li>Admins monitoring fair trade</li></ul>'
+    },
+    sih: {
+      title: "SIH26132",
+      sub: "Strengthening Market Linkages & Price Discovery for Farmers",
+      body: '<p>A Smart India Hackathon problem statement: farmers routinely sell below fair value because they lack visibility into multi-market prices, buyer demand and transport cost.</p>'
+        + '<h4>What this prototype demonstrates</h4><ul><li>Real-time price comparison across mandis</li><li>AI-assisted best market / best time to sell</li><li>Verified buyer discovery &amp; digital offers</li><li>Logistics, delivery and payment tracking in one ledger</li></ul>'
+    },
+    docs: {
+      title: "Documentation",
+      sub: "Getting started with the prototype",
+      body: '<h4>For farmers</h4><ul><li>Click <b>List Produce</b> to add a crop lot</li><li>Check the price board for today\'s best market</li></ul>'
+        + '<h4>For buyers</h4><ul><li>Sign in as a Buyer to unlock demand posting (in the full build)</li></ul>'
+        + '<p class="form-note">This is a static hackathon prototype — full API docs ship with the production build.</p>'
+    },
+    "price-index": { title: "Mandi Price Index", sub: "Live board · updates continuously", body: "" }
+  };
+
+  function renderInfo(key) {
+    var d = infoModals[key];
+    var html = '<span class="eyebrow"><span class="dot"></span> ' + d.sub + '</span>'
+      + '<h3 id="modalTitle">' + d.title + '</h3>';
+    if (key === "price-index") {
+      var rows = prices.map(function (p) {
+        return "<tr><td>" + p[0] + "</td><td>" + p[1] + " " + (p[2] === "up" ? "▲" : "▼") + "</td></tr>";
+      }).join("");
+      html += '<div class="modal-body"><table>' + rows + "</table></div>";
+    } else {
+      html += '<div class="modal-body">' + d.body + "</div>";
+    }
+    return html;
+  }
+
+  function renderSignin() {
+    return '<span class="eyebrow"><span class="dot"></span> Account</span>'
+      + '<h3 id="modalTitle">Sign in</h3>'
+      + '<p class="modal-sub">Mock login for this prototype — no real credentials required.</p>'
+      + '<form id="signinForm">'
+      + '<div class="field"><label>I am a</label><div class="role-pick">'
+      + '<label><input type="radio" name="role" value="Farmer" checked><span>Farmer</span></label>'
+      + '<label><input type="radio" name="role" value="Buyer"><span>Buyer</span></label>'
+      + '<label><input type="radio" name="role" value="Admin"><span>Admin</span></label>'
+      + '</div></div>'
+      + '<div class="field"><label for="signinName">Name</label><input id="signinName" type="text" placeholder="e.g. Ramesh Patil" required></div>'
+      + '<div class="field"><label for="signinPhone">Mobile number</label><input id="signinPhone" type="tel" placeholder="98xxxxxxxx" required></div>'
+      + '<button type="submit" class="btn btn-solid btn-lg">Sign in</button>'
+      + '</form>';
+  }
+
+  function renderList() {
+    return '<span class="eyebrow"><span class="dot"></span> Farmer / FPO</span>'
+      + '<h3 id="modalTitle">List your produce</h3>'
+      + '<p class="modal-sub">Add a lot — it lands on the buyer discovery board.</p>'
+      + '<form id="listForm">'
+      + '<div class="field"><label for="lotCrop">Crop</label><select id="lotCrop" required>'
+      + '<option value="">Select crop</option><option>Wheat</option><option>Soybean</option><option>Onion</option><option>Cotton</option><option>Maize</option><option>Gram</option>'
+      + '</select></div>'
+      + '<div class="field"><label for="lotQty">Quantity (quintal)</label><input id="lotQty" type="number" min="1" placeholder="e.g. 40" required></div>'
+      + '<div class="field"><label for="lotGrade">Quality grade</label><select id="lotGrade" required><option value="">Select grade</option><option>Grade A</option><option>Grade B</option><option>Grade C</option></select></div>'
+      + '<div class="field"><label for="lotLoc">Location</label><input id="lotLoc" type="text" placeholder="e.g. Nashik, Maharashtra" required></div>'
+      + '<button type="submit" class="btn btn-solid btn-lg">Add lot</button>'
+      + '</form>';
+  }
+
+  function renderApp() {
+    return '<span class="eyebrow"><span class="dot"></span> Mobile App</span>'
+      + '<h3 id="modalTitle">Get the AgriConnect app</h3>'
+      + '<p class="modal-sub">The app is in build. Leave your number and we\'ll text you the download link the day it ships.</p>'
+      + '<form id="appForm">'
+      + '<div class="field"><label for="appPhone">Mobile number</label><input id="appPhone" type="tel" placeholder="98xxxxxxxx" required></div>'
+      + '<button type="submit" class="btn btn-solid btn-lg">Join the waitlist</button>'
+      + '</form>';
+  }
+
+  function renderContact() {
+    return '<span class="eyebrow"><span class="dot"></span> Support</span>'
+      + '<h3 id="modalTitle">Contact us</h3>'
+      + '<p class="modal-sub">Send a message — we typically reply within one business day.</p>'
+      + '<form id="contactForm">'
+      + '<div class="field"><label for="cName">Name</label><input id="cName" type="text" required></div>'
+      + '<div class="field"><label for="cMsg">Message</label><textarea id="cMsg" required placeholder="How can we help?"></textarea></div>'
+      + '<button type="submit" class="btn btn-solid btn-lg">Send message</button>'
+      + '</form>';
+  }
+
+  /* ---------- modal open/close ---------- */
+  var modalBackdrop = document.getElementById("modalBackdrop");
+  var modalContent = document.getElementById("modalContent");
+  var modalClose = document.getElementById("modalClose");
+  var lastFocused = null;
+
+  function openModal(key) {
+    lastFocused = document.activeElement;
+    var html;
+    if (key === "signin") html = renderSignin();
+    else if (key === "list") html = renderList();
+    else if (key === "app") html = renderApp();
+    else if (key === "contact") html = renderContact();
+    else if (infoModals[key]) html = renderInfo(key);
+    else return;
+
+    modalContent.innerHTML = html;
+    modalBackdrop.classList.add("open");
+    document.body.style.overflow = "hidden";
+    closeDrawer();
+
+    var firstField = modalContent.querySelector("input, select, textarea, button");
+    if (firstField) firstField.focus();
+
+    var form = modalContent.querySelector("form");
+    if (form) form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      handleFormSubmit(form.id);
+    });
+  }
+
+  function closeModal() {
+    modalBackdrop.classList.remove("open");
+    document.body.style.overflow = "";
+    if (lastFocused) lastFocused.focus();
+  }
+
+  function handleFormSubmit(formId) {
+    if (formId === "signinForm") {
+      var role = modalContent.querySelector('input[name="role"]:checked').value;
+      var name = document.getElementById("signinName").value.trim();
+      state.user = { name: name, role: role };
+      saveState(); refreshUI(); closeModal();
+      toast("Signed in as " + name + " (" + role + ").");
+    } else if (formId === "listForm") {
+      var lot = {
+        crop: document.getElementById("lotCrop").value,
+        qty: document.getElementById("lotQty").value,
+        grade: document.getElementById("lotGrade").value,
+        loc: document.getElementById("lotLoc").value
+      };
+      state.lots.push(lot);
+      saveState(); refreshUI(); closeModal();
+      toast(lot.crop + " · " + lot.qty + "q listed from " + lot.loc + ". Buyer matching will start shortly.");
+    } else if (formId === "appForm") {
+      closeModal();
+      toast("You're on the waitlist — we'll text the download link the day it ships.");
+    } else if (formId === "contactForm") {
+      var nm = document.getElementById("cName").value.trim();
+      closeModal();
+      toast("Thanks " + nm + " — your message has been sent. We'll reply within 1 business day.");
+    }
+  }
+
+  document.addEventListener("click", function (e) {
+    var opener = e.target.closest("[data-open-modal]");
+    if (opener) { openModal(opener.getAttribute("data-open-modal")); return; }
+    var toaster = e.target.closest("[data-toast]");
+    if (toaster) { toast(toaster.getAttribute("data-toast")); return; }
+  });
+
+  modalClose.addEventListener("click", closeModal);
+  modalBackdrop.addEventListener("click", function (e) { if (e.target === modalBackdrop) closeModal(); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") { closeModal(); closeDrawer(); }
+  });
+</script>
+</body>
+</html>
