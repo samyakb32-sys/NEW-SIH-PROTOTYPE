@@ -275,9 +275,46 @@
   .sec-head h2 { font-size: clamp(1.9rem, 3vw, 2.6rem); font-weight: 600; letter-spacing: -0.01em; }
   .sec-head p { color: var(--ink-soft); font-size: 16.5px; margin-top: 14px; max-width: 52ch; }
 
-  .reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s cubic-bezier(.16,.8,.3,1), transform .7s cubic-bezier(.16,.8,.3,1); }
   .reveal.in { opacity: 1; transform: translateY(0); }
   @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
+
+  /* staggered entrance for grouped items */
+  .feat-grid .feat-card:nth-child(1) { transition-delay: 0ms; }
+  .feat-grid .feat-card:nth-child(2) { transition-delay: 70ms; }
+  .feat-grid .feat-card:nth-child(3) { transition-delay: 140ms; }
+  .feat-grid .feat-card:nth-child(4) { transition-delay: 210ms; }
+  .feat-grid .feat-card:nth-child(5) { transition-delay: 280ms; }
+  .feat-grid .feat-card:nth-child(6) { transition-delay: 350ms; }
+  .journey-list .jrow:nth-child(1) { transition-delay: 0ms; }
+  .journey-list .jrow:nth-child(2) { transition-delay: 50ms; }
+  .journey-list .jrow:nth-child(3) { transition-delay: 100ms; }
+  .journey-list .jrow:nth-child(4) { transition-delay: 150ms; }
+  .journey-list .jrow:nth-child(5) { transition-delay: 200ms; }
+  .journey-list .jrow:nth-child(6) { transition-delay: 250ms; }
+  .journey-list .jrow:nth-child(7) { transition-delay: 300ms; }
+  .journey-list .jrow:nth-child(8) { transition-delay: 350ms; }
+  .role-grid .role-card:nth-child(1) { transition-delay: 0ms; }
+  .role-grid .role-card:nth-child(2) { transition-delay: 100ms; }
+  .role-grid .role-card:nth-child(3) { transition-delay: 200ms; }
+  .impact-grid .impact-card:nth-child(1) { transition-delay: 0ms; }
+  .impact-grid .impact-card:nth-child(2) { transition-delay: 80ms; }
+  .impact-grid .impact-card:nth-child(3) { transition-delay: 160ms; }
+  .impact-grid .impact-card:nth-child(4) { transition-delay: 240ms; }
+  .quote-grid .quote-card:nth-child(1) { transition-delay: 0ms; }
+  .quote-grid .quote-card:nth-child(2) { transition-delay: 100ms; }
+  .quote-grid .quote-card:nth-child(3) { transition-delay: 200ms; }
+
+  .jrow.reveal { transform: translateX(-18px) translateY(0); }
+  .jrow.reveal.in { transform: translateX(0) translateY(0); }
+
+  /* ---------- scroll progress ---------- */
+  .scroll-progress {
+    position: fixed; top: 0; left: 0; height: 3px; width: 0%;
+    background: linear-gradient(90deg, var(--turmeric), var(--green));
+    z-index: 70; transition: width .1s linear;
+  }
+  @media (prefers-reduced-motion: reduce) { .scroll-progress { display: none; } }
 
   /* ---------- features ---------- */
   .feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line-soft); border: 1px solid var(--line-soft); }
@@ -375,6 +412,8 @@
 </head>
 <body>
 
+<div class="scroll-progress" id="scrollProgress"></div>
+
 <div class="ticker-band">
   <div class="ticker-track" id="tickerTrack"></div>
 </div>
@@ -471,13 +510,13 @@
         <h2>Everything between harvest and payment</h2>
         <p>Six systems, one flow — price discovery, AI recommendation, buyer matching, contracts, logistics and settlement, all tied to a single lot.</p>
       </div>
-      <div class="feat-grid reveal">
-        <div class="feat-card"><span class="num mono">01</span><h3>Real-Time Price Board</h3><p>Live prices pulled from multiple mandis, compared instantly so no one sells blind to a middleman's number.</p></div>
-        <div class="feat-card"><span class="num mono">02</span><h3>AI Recommendation</h3><p>Price trend forecasts, a best-sale-window, and a net-return calculator that nets out transport and storage.</p></div>
-        <div class="feat-card"><span class="num mono">03</span><h3>Verified Buyer Network</h3><p>Buyer discovery scored by crop, quantity, quality grade and distance — not just who shouts loudest.</p></div>
-        <div class="feat-card"><span class="num mono">04</span><h3>Digital Contracts</h3><p>Deal terms locked and generated as a digital agreement the moment an offer is accepted.</p></div>
-        <div class="feat-card"><span class="num mono">05</span><h3>Logistics Coordination</h3><p>Compare transporters on cost, route and timing, then book pickup without a phone call.</p></div>
-        <div class="feat-card"><span class="num mono">06</span><h3>Payment & Records</h3><p>Invoice, payment status and a full transaction ledger with digital receipts, end to end.</p></div>
+      <div class="feat-grid">
+        <div class="feat-card reveal"><span class="num mono">01</span><h3>Real-Time Price Board</h3><p>Live prices pulled from multiple mandis, compared instantly so no one sells blind to a middleman's number.</p></div>
+        <div class="feat-card reveal"><span class="num mono">02</span><h3>AI Recommendation</h3><p>Price trend forecasts, a best-sale-window, and a net-return calculator that nets out transport and storage.</p></div>
+        <div class="feat-card reveal"><span class="num mono">03</span><h3>Verified Buyer Network</h3><p>Buyer discovery scored by crop, quantity, quality grade and distance — not just who shouts loudest.</p></div>
+        <div class="feat-card reveal"><span class="num mono">04</span><h3>Digital Contracts</h3><p>Deal terms locked and generated as a digital agreement the moment an offer is accepted.</p></div>
+        <div class="feat-card reveal"><span class="num mono">05</span><h3>Logistics Coordination</h3><p>Compare transporters on cost, route and timing, then book pickup without a phone call.</p></div>
+        <div class="feat-card reveal"><span class="num mono">06</span><h3>Payment & Records</h3><p>Invoice, payment status and a full transaction ledger with digital receipts, end to end.</p></div>
       </div>
     </div>
   </section>
@@ -489,15 +528,15 @@
         <h2>From listed crop to cleared payment</h2>
         <p>One guided sequence carries every lot — no step skipped, no side channel back to a middleman.</p>
       </div>
-      <div class="journey-list reveal">
-        <div class="jrow"><span class="jnum mono">01</span><span class="jtitle">Add Crop</span><span class="jdesc">Farmer lists crop, quantity, quality grade and harvest date in minutes.</span></div>
-        <div class="jrow"><span class="jnum mono">02</span><span class="jtitle">Market Analysis</span><span class="jdesc">AI compares live prices and demand across every nearby mandi.</span></div>
-        <div class="jrow"><span class="jnum mono">03</span><span class="jtitle">Best Recommendation</span><span class="jdesc">Best market, best buyer, best time to sell — ranked by net return.</span></div>
-        <div class="jrow"><span class="jnum mono">04</span><span class="jtitle">Buyer Matching</span><span class="jdesc">Verified buyers surfaced by crop, quality and location match score.</span></div>
-        <div class="jrow"><span class="jnum mono">05</span><span class="jtitle">Digital Offers</span><span class="jdesc">Offers compared side by side; the farmer accepts the strongest one.</span></div>
-        <div class="jrow"><span class="jnum mono">06</span><span class="jtitle">Deal Confirmation</span><span class="jdesc">Terms locked, a digital contract generated — no paperwork, no ambiguity.</span></div>
-        <div class="jrow"><span class="jnum mono">07</span><span class="jtitle">Logistics</span><span class="jdesc">Best transport option booked, with cost and ETA agreed upfront.</span></div>
-        <div class="jrow"><span class="jnum mono">08</span><span class="jtitle">Delivery & Payment</span><span class="jdesc">Quality verified on arrival, payment tracked until it clears.</span></div>
+      <div class="journey-list">
+        <div class="jrow reveal"><span class="jnum mono">01</span><span class="jtitle">Add Crop</span><span class="jdesc">Farmer lists crop, quantity, quality grade and harvest date in minutes.</span></div>
+        <div class="jrow reveal"><span class="jnum mono">02</span><span class="jtitle">Market Analysis</span><span class="jdesc">AI compares live prices and demand across every nearby mandi.</span></div>
+        <div class="jrow reveal"><span class="jnum mono">03</span><span class="jtitle">Best Recommendation</span><span class="jdesc">Best market, best buyer, best time to sell — ranked by net return.</span></div>
+        <div class="jrow reveal"><span class="jnum mono">04</span><span class="jtitle">Buyer Matching</span><span class="jdesc">Verified buyers surfaced by crop, quality and location match score.</span></div>
+        <div class="jrow reveal"><span class="jnum mono">05</span><span class="jtitle">Digital Offers</span><span class="jdesc">Offers compared side by side; the farmer accepts the strongest one.</span></div>
+        <div class="jrow reveal"><span class="jnum mono">06</span><span class="jtitle">Deal Confirmation</span><span class="jdesc">Terms locked, a digital contract generated — no paperwork, no ambiguity.</span></div>
+        <div class="jrow reveal"><span class="jnum mono">07</span><span class="jtitle">Logistics</span><span class="jdesc">Best transport option booked, with cost and ETA agreed upfront.</span></div>
+        <div class="jrow reveal"><span class="jnum mono">08</span><span class="jtitle">Delivery & Payment</span><span class="jdesc">Quality verified on arrival, payment tracked until it clears.</span></div>
       </div>
     </div>
   </section>
@@ -509,22 +548,22 @@
         <h2>One ledger, three roles</h2>
         <p>Farmers, buyers and regulators each work from the same records, through a view built for their job.</p>
       </div>
-      <div class="role-grid reveal">
-        <div class="role-card">
+      <div class="role-grid">
+        <div class="role-card reveal">
           <div class="role-top farmer"><span class="tag mono">Sell</span><h3>Farmer / FPO</h3></div>
           <div class="role-body">
             <p class="tagline">Sell produce at the best price, with full transparency.</p>
             <ul><li>Add produce & track lots</li><li>AI price recommendations</li><li>Compare buyer offers</li></ul>
           </div>
         </div>
-        <div class="role-card">
+        <div class="role-card reveal">
           <div class="role-top buyer"><span class="tag mono">Source</span><h3>Buyer / Processor</h3></div>
           <div class="role-body">
             <p class="tagline">Source quality produce reliably and efficiently.</p>
             <ul><li>Post demand & search lots</li><li>Send digital offers</li><li>Track orders end-to-end</li></ul>
           </div>
         </div>
-        <div class="role-card">
+        <div class="role-card reveal">
           <div class="role-top admin"><span class="tag mono">Govern</span><h3>Admin / Government</h3></div>
           <div class="role-body">
             <p class="tagline">Monitor, regulate, and ensure fair trade at scale.</p>
@@ -541,11 +580,11 @@
         <span class="eyebrow"><span class="dot"></span> Impact</span>
         <h2>What the ledger shows so far</h2>
       </div>
-      <div class="impact-grid reveal">
-        <div class="impact-card"><b class="mono">+18%</b><span>Improved farmer income</span></div>
-        <div class="impact-card"><b class="mono">−22%</b><span>Reduced post-harvest loss</span></div>
-        <div class="impact-card"><b class="mono">3×</b><span>Faster buyer discovery</span></div>
-        <div class="impact-card"><b class="mono">−15%</b><span>Lower transaction cost</span></div>
+      <div class="impact-grid">
+        <div class="impact-card reveal"><b class="mono">+18%</b><span>Improved farmer income</span></div>
+        <div class="impact-card reveal"><b class="mono">−22%</b><span>Reduced post-harvest loss</span></div>
+        <div class="impact-card reveal"><b class="mono">3×</b><span>Faster buyer discovery</span></div>
+        <div class="impact-card reveal"><b class="mono">−15%</b><span>Lower transaction cost</span></div>
       </div>
     </div>
   </section>
@@ -556,18 +595,18 @@
         <span class="eyebrow"><span class="dot"></span> Voices</span>
         <h2>Trusted across the value chain</h2>
       </div>
-      <div class="quote-grid reveal">
-        <div class="quote-card">
+      <div class="quote-grid">
+        <div class="quote-card reveal">
           <span class="qmark">"</span>
           <p class="q">Pehle middleman jo price bolta tha wahi lena padta tha. Ab main 3 mandiyon ka price dekh kar best jagah bech sakta hoon.</p>
           <div class="quote-who"><div class="quote-avatar">R</div><div><b>Ramesh Patil</b><span>Wheat Farmer, Nashik</span></div></div>
         </div>
-        <div class="quote-card">
+        <div class="quote-card reveal">
           <span class="qmark">"</span>
           <p class="q">Buyer matching se humein verified farmers directly milte hain — sourcing time aadha ho gaya.</p>
           <div class="quote-who"><div class="quote-avatar">S</div><div><b>Sunita Traders</b><span>Onion Procurement, Pune</span></div></div>
         </div>
-        <div class="quote-card">
+        <div class="quote-card reveal">
           <span class="qmark">"</span>
           <p class="q">Transparent transaction records se dispute resolution aur market monitoring dono easy ho gaye.</p>
           <div class="quote-who"><div class="quote-avatar">D</div><div><b>Dept. of Agriculture</b><span>State Pilot Program</span></div></div>
@@ -645,15 +684,34 @@
   tickClock();
   setInterval(tickClock, 15000);
 
-  if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches && "IntersectionObserver" in window) {
+  var prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (!prefersReduced && "IntersectionObserver" in window) {
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
         if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
       });
-    }, { threshold: 0.12 });
+    }, { threshold: 0.15, rootMargin: "0px 0px -8% 0px" });
     document.querySelectorAll(".reveal").forEach(function (el) { io.observe(el); });
   } else {
     document.querySelectorAll(".reveal").forEach(function (el) { el.classList.add("in"); });
+  }
+
+  /* ---------- scroll progress bar ---------- */
+  if (!prefersReduced) {
+    var progressBar = document.getElementById("scrollProgress");
+    var ticking = false;
+    function updateProgress() {
+      var scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      var pct = scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0;
+      progressBar.style.width = Math.min(100, Math.max(0, pct)) + "%";
+      ticking = false;
+    }
+    updateProgress();
+    window.addEventListener("scroll", function () {
+      if (!ticking) { requestAnimationFrame(updateProgress); ticking = true; }
+    }, { passive: true });
+    window.addEventListener("resize", updateProgress);
   }
 
   /* ---------- toast ---------- */
