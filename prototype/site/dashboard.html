@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
   :root {
     --bg: #f6f7f9;
@@ -368,27 +369,20 @@
   document.getElementById("miniPriceTable").querySelector("tbody").innerHTML = priceRows(prices.slice(0, 4));
   document.getElementById("fullPriceTable").querySelector("tbody").innerHTML = priceRows(prices);
 
-  var mockOffers = [
-    { buyer: "Sunita Traders, Pune", crop: "Wheat lot #1", price: 2860, status: "pending" },
-    { buyer: "MSWC Warehouse, Nagpur", crop: "Soybean lot #2", price: 4790, status: "pending" },
-    { buyer: "AgroFresh Mills, Indore", crop: "Cotton lot #1", price: 7310, status: "pending" }
-  ];
+  /* ---------- supabase ---------- */
+  var SUPABASE_URL = "https://zuacwddjassysntscpzy.supabase.co";
+  var SUPABASE_KEY = "sb_publishable_De6ugFUdJldaYu5qssrb6w_aIN2iVUT";
+  var sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+  var BUYER_POOL = ["Sunita Traders, Pune", "MSWC Warehouse, Nagpur", "AgroFresh Mills, Indore", "Vidarbha AgroCorp", "Krishi Setu FPO"];
 
   /* ---------- state ---------- */
-  var state = {
-    user: JSON.parse(localStorage.getItem("ac_user") || "null"),
-    lots: JSON.parse(localStorage.getItem("ac_lots") || "[]")
-  };
-  function saveState() {
-    localStorage.setItem("ac_user", JSON.stringify(state.user));
-    localStorage.setItem("ac_lots", JSON.stringify(state.lots));
-  }
+  var state = { user: null, lots: [], offers: [] };
 
   var gateWrap = document.getElementById("gateWrap");
   var appShell = document.getElementById("appShell");
   var mobileTabbar = document.getElementById("mobileTabbar");
 
-  function renderGate() {
+  function renderGate(errorMsg) {
     gateWrap.hidden = false;
     appShell.hidden = true;
     mobileTabbar.hidden = true;
@@ -396,7 +390,8 @@
       '<div class="gate">' +
         '<div class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>' +
         '<h2>Sign in to your dashboard</h2>' +
-        '<p>Your farmer dashboard tracks produce lots, live buyer offers and AI sell recommendations — sign in to continue (mock login, no real credentials needed).</p>' +
+        '<p>Your farmer dashboard tracks produce lots, live buyer offers and AI sell recommendations, backed by a real database — sign in to continue (no email/password needed for this demo).</p>' +
+        (errorMsg ? '<p style="color:var(--red-ic); font-size:13px;">' + errorMsg + '</p>' : '') +
         '<form id="gateForm">' +
           '<div class="field"><label>I am a</label><div class="role-pick-form">' +
             '<label><input type="radio" name="role" value="Farmer" checked><span>Farmer</span></label>' +
@@ -404,36 +399,69 @@
             '<label><input type="radio" name="role" value="Admin"><span>Admin</span></label>' +
           '</div></div>' +
           '<div class="field"><label for="gateName">Name</label><input id="gateName" type="text" placeholder="e.g. Ramesh Patil" required></div>' +
-          '<div class="field"><label for="gatePhone">Mobile number</label><input id="gatePhone" type="tel" placeholder="98xxxxxxxx" required></div>' +
           '<button type="submit" class="btn btn-solid" style="width:100%; justify-content:center;">Sign in &amp; enter dashboard</button>' +
         '</form>' +
         '<p style="margin-top:16px;"><a href="index.html" class="back-link" style="justify-content:center; display:inline-flex;">← Back to site</a></p>' +
       '</div>';
 
-    document.getElementById("gateForm").addEventListener("submit", function (e) {
-      e.preventDefault();
-      var role = document.querySelector('input[name="role"]:checked').value;
-      var name = document.getElementById("gateName").value.trim();
-      state.user = { name: name, role: role };
-      saveState();
-      toast("Signed in as " + name + " (" + role + ").");
-      renderApp();
-    });
+    document.getElementById("gateForm").addEventListener("submit", handleGateSubmit);
   }
 
-  function renderApp() {
+  async function handleGateSubmit(e) {
+    e.preventDefault();
+    if (!sb) { renderGate("Backend unavailable — refresh and try again."); return; }
+    var submitBtn = e.target.querySelector("button[type=submit]");
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Signing in...";
+    var role = document.querySelector('input[name="role"]:checked').value;
+    var name = document.getElementById("gateName").value.trim();
+
+    var { data: authData, error: authError } = await sb.auth.signInAnonymously();
+    if (authError) {
+      renderGate("Sign-in failed: " + authError.message + " — make sure Anonymous Sign-Ins is enabled in Supabase (Authentication → Sign In / Providers).");
+      return;
+    }
+    var uid = authData.user.id;
+    var { error: profileError } = await sb.from("profiles").upsert({ id: uid, name: name, role: role });
+    if (profileError) {
+      renderGate("Could not save your profile: " + profileError.message + " — check the schema was created (see supabase_schema.sql).");
+      return;
+    }
+    state.user = { id: uid, name: name, role: role };
+    toast("Signed in as " + name + " (" + role + ").");
+    await renderApp();
+  }
+
+  async function loadProfileAndApp(uid) {
+    var { data: profile, error } = await sb.from("profiles").select("*").eq("id", uid).maybeSingle();
+    if (error || !profile) {
+      await sb.auth.signOut();
+      renderGate();
+      return;
+    }
+    state.user = profile;
+    await renderApp();
+  }
+
+  async function renderApp() {
     gateWrap.hidden = true;
     gateWrap.innerHTML = "";
     appShell.hidden = false;
     mobileTabbar.hidden = false;
 
     document.getElementById("greetName").textContent = "Welcome back, " + state.user.name.split(" ")[0] + " 👋";
-    var rolePill = document.getElementById("rolePill");
-    rolePill.textContent = state.user.name + " · " + state.user.role;
+    document.getElementById("rolePill").textContent = state.user.name + " · " + state.user.role;
 
-    renderLots();
-    renderOffers();
+    await loadLots();
+    await loadOffers();
     renderAdvisorLog();
+  }
+
+  async function loadLots() {
+    var { data, error } = await sb.from("lots").select("*").eq("farmer_id", state.user.id).order("created_at", { ascending: false });
+    if (error) { toast("Could not load produce: " + error.message); return; }
+    state.lots = data || [];
+    renderLots();
   }
 
   function renderLots() {
@@ -443,75 +471,106 @@
       tbody.innerHTML = '<tr><td colspan="6" class="empty-row">No lots yet — add your first produce lot above.</td></tr>';
       return;
     }
-    tbody.innerHTML = state.lots.map(function (lot, i) {
+    tbody.innerHTML = state.lots.map(function (lot) {
       var chipClass = lot.status === "matching" ? "chip-matching" : lot.status === "offer" ? "chip-offer" : "chip-listed";
       var chipText = lot.status === "matching" ? "Matching Buyers" : lot.status === "offer" ? "Offer Received" : "Listed";
-      return "<tr><td>" + lot.crop + "</td><td>" + lot.qty + "q</td><td>" + lot.grade + "</td><td>" + lot.loc + "</td>" +
+      return "<tr><td>" + lot.crop + "</td><td>" + lot.qty + "q</td><td>" + lot.grade + "</td><td>" + lot.location + "</td>" +
         '<td><span class="chip ' + chipClass + '">' + chipText + "</span></td>" +
-        '<td><button type="button" class="btn btn-line btn-sm" data-remove-lot="' + i + '">Remove</button></td></tr>';
+        '<td><button type="button" class="btn btn-line btn-sm" data-remove-lot="' + lot.id + '">Remove</button></td></tr>';
     }).join("");
+  }
+
+  async function loadOffers() {
+    var { data, error } = await sb.from("offers").select("*, lots!inner(crop, farmer_id)").eq("lots.farmer_id", state.user.id).order("created_at", { ascending: false });
+    if (error) { toast("Could not load offers: " + error.message); return; }
+    state.offers = data || [];
+    renderOffers();
   }
 
   function renderOffers() {
     var wrap = document.getElementById("offersList");
-    wrap.innerHTML = mockOffers.map(function (o, i) {
+    if (!state.offers.length) {
+      wrap.innerHTML = '<p class="empty-row">No offers yet — add a produce lot to get matched with buyers.</p>';
+      document.getElementById("statOffers").textContent = 0;
+      return;
+    }
+    wrap.innerHTML = state.offers.map(function (o) {
+      var crop = o.lots ? o.lots.crop : "Lot";
       if (o.status === "accepted") {
-        return '<div class="offer-card"><div class="offer-left"><b>' + o.crop + "</b><span>" + o.buyer + '</span></div><span class="chip chip-accepted">Accepted</span></div>';
+        return '<div class="offer-card"><div class="offer-left"><b>' + crop + "</b><span>" + o.buyer_name + '</span></div><span class="chip chip-accepted">Accepted</span></div>';
       }
       if (o.status === "rejected") {
-        return '<div class="offer-card"><div class="offer-left"><b>' + o.crop + "</b><span>" + o.buyer + '</span></div><span class="chip chip-rejected">Rejected</span></div>';
+        return '<div class="offer-card"><div class="offer-left"><b>' + crop + "</b><span>" + o.buyer_name + '</span></div><span class="chip chip-rejected">Rejected</span></div>';
       }
-      return '<div class="offer-card"><div class="offer-left"><b>' + o.crop + "</b><span>" + o.buyer + '</span></div>' +
-        '<div class="offer-price">₹' + o.price.toLocaleString("en-IN") + "/Q</div>" +
-        '<div class="offer-actions"><button type="button" class="btn btn-line btn-sm" data-reject-offer="' + i + '">Decline</button><button type="button" class="btn btn-solid btn-sm" data-accept-offer="' + i + '">Accept</button></div></div>';
+      return '<div class="offer-card"><div class="offer-left"><b>' + crop + "</b><span>" + o.buyer_name + '</span></div>' +
+        '<div class="offer-price">₹' + Number(o.price).toLocaleString("en-IN") + "/Q</div>" +
+        '<div class="offer-actions"><button type="button" class="btn btn-line btn-sm" data-reject-offer="' + o.id + '">Decline</button><button type="button" class="btn btn-solid btn-sm" data-accept-offer="' + o.id + '">Accept</button></div></div>';
     }).join("");
-    document.getElementById("statOffers").textContent = mockOffers.filter(function (o) { return o.status === "pending" || !o.status; }).length;
+    document.getElementById("statOffers").textContent = state.offers.filter(function (o) { return o.status === "pending"; }).length;
   }
 
-  document.addEventListener("click", function (e) {
+  document.addEventListener("click", async function (e) {
     var rm = e.target.closest("[data-remove-lot]");
     if (rm) {
-      var idx = +rm.getAttribute("data-remove-lot");
-      state.lots.splice(idx, 1);
-      saveState(); renderLots();
+      var lotId = rm.getAttribute("data-remove-lot");
+      var { error } = await sb.from("lots").delete().eq("id", lotId);
+      if (error) { toast("Could not remove lot: " + error.message); return; }
       toast("Lot removed.");
+      await loadLots(); await loadOffers();
       return;
     }
     var acc = e.target.closest("[data-accept-offer]");
     if (acc) {
-      mockOffers[+acc.getAttribute("data-accept-offer")].status = "accepted";
-      renderOffers();
+      var { error: accErr } = await sb.from("offers").update({ status: "accepted" }).eq("id", acc.getAttribute("data-accept-offer"));
+      if (accErr) { toast("Could not accept offer: " + accErr.message); return; }
+      await loadOffers();
       toast("Offer accepted — a digital contract will be generated (demo).");
       return;
     }
     var rej = e.target.closest("[data-reject-offer]");
     if (rej) {
-      mockOffers[+rej.getAttribute("data-reject-offer")].status = "rejected";
-      renderOffers();
+      var { error: rejErr } = await sb.from("offers").update({ status: "rejected" }).eq("id", rej.getAttribute("data-reject-offer"));
+      if (rejErr) { toast("Could not decline offer: " + rejErr.message); return; }
+      await loadOffers();
       toast("Offer declined.");
       return;
     }
   });
 
   /* ---------- add produce form ---------- */
-  document.getElementById("lotForm").addEventListener("submit", function (e) {
+  document.getElementById("lotForm").addEventListener("submit", async function (e) {
     e.preventDefault();
+    var submitBtn = e.target.querySelector("button[type=submit]");
+    submitBtn.disabled = true;
     var crop = document.getElementById("lotCrop").value;
     var qty = document.getElementById("lotQty").value;
     var grade = document.getElementById("lotGrade").value;
     var loc = document.getElementById("lotLoc").value;
-    state.lots.push({ crop: crop, qty: qty, grade: grade, loc: loc, status: "matching" });
-    saveState(); renderLots();
+
+    var { data: newLot, error } = await sb.from("lots").insert({
+      farmer_id: state.user.id, crop: crop, qty: qty, grade: grade, location: loc, status: "matching"
+    }).select().single();
+
+    submitBtn.disabled = false;
+    if (error) { toast("Could not add lot: " + error.message); return; }
+
+    var shuffled = BUYER_POOL.slice().sort(function () { return Math.random() - 0.5; }).slice(0, 2);
+    var basePrice = 2000 + Math.floor(Math.random() * 5500);
+    await sb.from("offers").insert(shuffled.map(function (buyer, i) {
+      return { lot_id: newLot.id, buyer_name: buyer, price: basePrice + i * 40, status: "pending" };
+    }));
+
+    await loadLots(); await loadOffers();
 
     var hold = Math.random() > 0.5;
     var recBox = document.getElementById("recBox");
     var recText = document.getElementById("recText");
     recText.textContent = hold
       ? "Hold for 3–4 days: " + crop + " prices are trending up (~+3–5%) in nearby mandis. Selling now would leave value on the table."
-      : "Sell now: " + crop + " prices are at a seasonal high in your district — waiting risks a pullback. Best matched buyer offers ₹" + (2400 + Math.floor(Math.random() * 3000)) + "/Q net.";
+      : "Sell now: " + crop + " prices are at a seasonal high in your district — waiting risks a pullback. Best matched buyer offers ₹" + basePrice + "/Q net.";
     recBox.classList.add("show");
     this.reset();
-    toast(crop + " · " + qty + "q listed. Matching verified buyers now.");
+    toast(crop + " · " + qty + "q listed. Matched with " + shuffled.length + " verified buyers.");
   });
 
   /* ---------- district ---------- */
@@ -520,9 +579,9 @@
   });
 
   /* ---------- sign out ---------- */
-  document.getElementById("signOutBtn").addEventListener("click", function () {
+  document.getElementById("signOutBtn").addEventListener("click", async function () {
+    await sb.auth.signOut();
     state.user = null;
-    saveState();
     toast("Signed out.");
     renderGate();
   });
@@ -577,7 +636,18 @@
   }
 
   /* ---------- boot ---------- */
-  if (state.user) { renderApp(); } else { renderGate(); }
+  (async function boot() {
+    if (!sb) {
+      renderGate("Could not load the backend service (network blocked or an ad-blocker is active). Please disable it and refresh.");
+      return;
+    }
+    try {
+      var { data: { session } } = await sb.auth.getSession();
+      if (session) { await loadProfileAndApp(session.user.id); } else { renderGate(); }
+    } catch (err) {
+      renderGate("Could not reach the backend: " + err.message + ". Check your connection and refresh.");
+    }
+  })();
 </script>
 </body>
 </html>

@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
   :root {
     --bg: #f6f7f9;
@@ -720,20 +721,25 @@
     if (!notifPop.contains(e.target) && e.target !== notifBtn) notifPop.classList.remove("open");
   });
 
+  /* ---------- supabase ---------- */
+  var SUPABASE_URL = "https://zuacwddjassysntscpzy.supabase.co";
+  var SUPABASE_KEY = "sb_publishable_De6ugFUdJldaYu5qssrb6w_aIN2iVUT";
+  var sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
   /* ---------- state ---------- */
-  var state = {
-    user: JSON.parse(localStorage.getItem("ac_user") || "null"),
-    lots: JSON.parse(localStorage.getItem("ac_lots") || "[]")
-  };
-  function saveState() {
-    localStorage.setItem("ac_user", JSON.stringify(state.user));
-    localStorage.setItem("ac_lots", JSON.stringify(state.lots));
-  }
+  var state = { user: null };
   function refreshUI() {
     var rolePillText = document.getElementById("rolePillText");
     if (rolePillText) rolePillText.textContent = state.user ? state.user.name + " · " + state.user.role : "Farmer";
   }
-  refreshUI();
+  (async function hydrateSession() {
+    if (!sb) return;
+    var { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      var { data: profile } = await sb.from("profiles").select("*").eq("id", session.user.id).maybeSingle();
+      if (profile) { state.user = profile; refreshUI(); }
+    }
+  })();
 
   /* ---------- modal content ---------- */
   var infoModals = {
@@ -785,7 +791,7 @@
   function renderSignin() {
     return '<span class="badge-eyebrow">Account</span>'
       + '<h3 id="modalTitle">Sign in</h3>'
-      + '<p class="modal-sub">Mock login for this prototype — no real credentials required.</p>'
+      + '<p class="modal-sub">No email or password needed for this demo — a real account is created for you behind the scenes.</p>'
       + '<form id="signinForm">'
       + '<div class="field"><label>I am a</label><div class="role-pick-form">'
       + '<label><input type="radio" name="role" value="Farmer" checked><span>Farmer</span></label>'
@@ -793,7 +799,6 @@
       + '<label><input type="radio" name="role" value="Admin"><span>Admin</span></label>'
       + '</div></div>'
       + '<div class="field"><label for="signinName">Name</label><input id="signinName" type="text" placeholder="e.g. Ramesh Patil" required></div>'
-      + '<div class="field"><label for="signinPhone">Mobile number</label><input id="signinPhone" type="tel" placeholder="98xxxxxxxx" required></div>'
       + '<button type="submit" class="btn btn-solid btn-lg">Sign in</button>'
       + '</form>';
   }
@@ -835,7 +840,7 @@
     var form = modalContent.querySelector("form");
     if (form) form.addEventListener("submit", function (e) {
       e.preventDefault();
-      handleFormSubmit(form.id);
+      handleFormSubmit(form.id, e);
     });
   }
   window.openModal = openModal;
@@ -846,12 +851,29 @@
     if (lastFocused) lastFocused.focus();
   }
 
-  function handleFormSubmit(formId) {
+  async function handleFormSubmit(formId, e) {
     if (formId === "signinForm") {
+      if (!sb) { toast("Backend unavailable — refresh and try again."); return; }
+      var submitBtn = e.target.querySelector("button[type=submit]");
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Signing in...";
       var role = modalContent.querySelector('input[name="role"]:checked').value;
       var name = document.getElementById("signinName").value.trim();
-      state.user = { name: name, role: role };
-      saveState(); refreshUI(); closeModal();
+
+      var { data: authData, error: authError } = await sb.auth.signInAnonymously();
+      if (authError) {
+        submitBtn.disabled = false; submitBtn.textContent = "Sign in";
+        toast("Sign-in failed: " + authError.message);
+        return;
+      }
+      var { error: profileError } = await sb.from("profiles").upsert({ id: authData.user.id, name: name, role: role });
+      if (profileError) {
+        submitBtn.disabled = false; submitBtn.textContent = "Sign in";
+        toast("Could not save profile: " + profileError.message);
+        return;
+      }
+      state.user = { id: authData.user.id, name: name, role: role };
+      refreshUI(); closeModal();
       toast("Signed in as " + name + " (" + role + ").");
     } else if (formId === "contactForm") {
       var nm = document.getElementById("cName").value.trim();
