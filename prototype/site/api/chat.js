@@ -59,8 +59,7 @@ module.exports = async (req, res) => {
         systemInstruction: systemInstruction,
         generationConfig: {
           temperature: 0.6,
-          maxOutputTokens: 1024,
-          thinkingConfig: { thinkingBudget: 0 }
+          maxOutputTokens: 1024
         }
       })
     });
