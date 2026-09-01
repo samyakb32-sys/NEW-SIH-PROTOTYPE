@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="i18n.js"></script>
 <style>
   :root {
     --bg: #f6f7f9; --bg-alt: #eef1f4; --card: #ffffff; --border: #e3e7ec;
@@ -106,11 +107,15 @@
     <span class="mark"><svg width="16" height="16" viewBox="0 0 30 30" fill="none"><path d="M15 22V13M15 13C15 9 11 7 8 7C8 12 10 15 15 13Z" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 13C15 9.5 18.5 7.5 22 8C22 12 19.5 14.5 15 13Z" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
     AgriConnect
   </a>
-  <span class="step">Deal Accepted → Transport & Logistics</span>
+  <span class="step" data-i18n="transport_step">Deal Accepted → Transport & Logistics</span>
+  <label class="lang-pick" style="display:flex; align-items:center; gap:5px; border:1px solid var(--border); border-radius:8px; padding:7px 10px; font-size:13px; color:var(--ink-soft); background:var(--card);">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></svg>
+    <select id="langSelect" style="border:none; background:none; font:inherit; color:var(--ink); cursor:pointer;"></select>
+  </label>
 </header>
 
 <div class="wrap" id="content">
-  <div class="center-note">Loading your deal...</div>
+  <div class="center-note" data-i18n="transport_loading">Loading your deal...</div>
 </div>
 
 <script>
@@ -143,25 +148,26 @@
   }
 
   function renderCarriers(deal) {
+    var t = window.AgriI18n.t;
     content.innerHTML =
-      '<span class="badge-eyebrow">Step 7 · Logistics</span>' +
-      '<h1 style="margin-top:14px; font-size:26px;">Arrange transport for your deal</h1>' +
-      '<p style="color:var(--ink-soft); margin-top:8px;">Compare trusted courier &amp; logistics partners and book pickup — shown for demo purposes.</p>' +
+      '<span class="badge-eyebrow">' + t("transport_badge") + '</span>' +
+      '<h1 style="margin-top:14px; font-size:26px;">' + t("transport_title") + '</h1>' +
+      '<p style="color:var(--ink-soft); margin-top:8px;">' + t("transport_sub") + '</p>' +
       '<div class="deal-card">' +
-        '<div class="dl"><b>' + deal.crop + ' · ' + deal.qty + 'q (' + deal.grade + ')</b><span>Buyer: ' + deal.buyer_name + ' · From ' + deal.location + '</span></div>' +
+        '<div class="dl"><b>' + deal.crop + ' · ' + deal.qty + 'q (' + deal.grade + ')</b><span>' + t("transport_buyer_label") + ' ' + deal.buyer_name + ' · ' + t("transport_from") + ' ' + deal.location + '</span></div>' +
         '<div class="dp">₹' + Number(deal.price).toLocaleString("en-IN") + '/Q</div>' +
       '</div>' +
       '<div class="carrier-grid">' +
       CARRIERS.map(function (c, i) {
         return '<div class="carrier-card">' +
           '<div class="carrier-logo" style="background:' + c.bg + '">' + c.tag + '</div>' +
-          '<div class="carrier-info"><b>' + c.name + '</b><span class="carrier-stars">★ ' + c.rating + ' rating</span></div>' +
-          '<div class="carrier-meta"><div>ETA<br><b>' + c.eta + '</b></div><div>Est. Cost<br><b>₹' + c.cost + '</b></div></div>' +
-          '<button type="button" class="btn btn-solid" data-book="' + i + '">Book Pickup</button>' +
+          '<div class="carrier-info"><b>' + c.name + '</b><span class="carrier-stars">★ ' + c.rating + ' ' + t("transport_rating") + '</span></div>' +
+          '<div class="carrier-meta"><div>' + t("transport_eta") + '<br><b>' + c.eta + '</b></div><div>' + t("transport_est_cost") + '<br><b>₹' + c.cost + '</b></div></div>' +
+          '<button type="button" class="btn btn-solid" data-book="' + i + '">' + t("transport_book_pickup") + '</button>' +
         '</div>';
       }).join("") +
       '</div>' +
-      '<p style="text-align:center; margin-top:24px;"><a href="dashboard.html" class="btn btn-line">← Back to dashboard</a></p>';
+      '<p style="text-align:center; margin-top:24px;"><a href="dashboard.html" class="btn btn-line">' + t("transport_back_dashboard") + '</a></p>';
 
     content.querySelectorAll("[data-book]").forEach(function (btn) {
       btn.addEventListener("click", function () { bookCarrier(deal, CARRIERS[+btn.getAttribute("data-book")]); });
@@ -173,26 +179,34 @@
     if (sb && deal.lot_id) {
       await sb.from("lots").update({ status: "shipped" }).eq("id", deal.lot_id);
     }
+    lastCarrier = carrier; lastTrackingId = trackingId;
     renderConfirmation(deal, carrier, trackingId);
   }
 
   function renderConfirmation(deal, carrier, trackingId) {
+    var t = window.AgriI18n.t;
     content.innerHTML =
       '<div class="confirm-wrap">' +
         '<div class="confirm-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></div>' +
-        '<h1 style="font-size:24px;">Pickup booked with ' + carrier.name + '</h1>' +
+        '<h1 style="font-size:24px;">' + t("transport_confirm_title_prefix") + ' ' + carrier.name + '</h1>' +
         '<p style="color:var(--ink-soft); margin-top:8px;">' + deal.crop + ' · ' + deal.qty + 'q for ' + deal.buyer_name + '</p>' +
         '<div class="tracking-id">' + trackingId + '</div>' +
         '<div class="progress-track">' +
-          '<div class="step-dot done"><div class="dot">✓</div><span>Booked</span></div>' +
-          '<div class="step-dot"><div class="dot">2</div><span>Picked Up</span></div>' +
-          '<div class="step-dot"><div class="dot">3</div><span>In Transit</span></div>' +
-          '<div class="step-dot"><div class="dot">4</div><span>Delivered</span></div>' +
+          '<div class="step-dot done"><div class="dot">✓</div><span>' + t("transport_progress_booked") + '</span></div>' +
+          '<div class="step-dot"><div class="dot">2</div><span>' + t("transport_progress_pickedup") + '</span></div>' +
+          '<div class="step-dot"><div class="dot">3</div><span>' + t("transport_progress_transit") + '</span></div>' +
+          '<div class="step-dot"><div class="dot">4</div><span>' + t("transport_progress_delivered") + '</span></div>' +
         '</div>' +
-        '<p style="color:var(--ink-soft); font-size:13px;">Estimated delivery: ' + carrier.eta + ' · Demo tracking, not a real shipment.</p>' +
-        '<a href="dashboard.html" class="btn btn-solid" style="margin-top:10px;">Back to Dashboard</a>' +
+        '<p style="color:var(--ink-soft); font-size:13px;">' + t("transport_est_delivery") + ' ' + carrier.eta + ' · ' + t("transport_demo_note") + '</p>' +
+        '<a href="dashboard.html" class="btn btn-solid" style="margin-top:10px;">' + t("transport_back_to_dashboard_btn") + '</a>' +
       '</div>';
   }
+
+  var lastDeal = null, lastCarrier = null, lastTrackingId = null;
+  document.addEventListener("agri:langchange", function () {
+    if (lastTrackingId) { renderConfirmation(lastDeal, lastCarrier, lastTrackingId); }
+    else if (lastDeal) { renderCarriers(lastDeal); }
+  });
 
   (async function boot() {
     if (!offerId) { renderError("No deal specified. Accept an offer from your dashboard first."); return; }
@@ -202,10 +216,11 @@
       if (!session) { renderError('Please <a href="dashboard.html">sign in</a> first.'); return; }
       var { data: offer, error } = await sb.from("offers").select("*, lots(crop, qty, grade, location, id)").eq("id", offerId).maybeSingle();
       if (error || !offer) { renderError("Could not find this deal."); return; }
-      renderCarriers({
+      lastDeal = {
         crop: offer.lots.crop, qty: offer.lots.qty, grade: offer.lots.grade, location: offer.lots.location,
         lot_id: offer.lots.id, buyer_name: offer.buyer_name, price: offer.price
-      });
+      };
+      renderCarriers(lastDeal);
     } catch (err) {
       renderError("Could not reach the backend: " + err.message);
     }

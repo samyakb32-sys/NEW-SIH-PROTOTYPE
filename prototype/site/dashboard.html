@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="i18n.js"></script>
 <style>
   :root {
     --bg: #f6f7f9;
@@ -99,6 +100,9 @@
   .district-pick select { border: none; background: none; font: inherit; color: var(--ink); cursor: pointer; }
   .district-pick select:focus { outline: none; }
   @media (max-width: 640px) { .district-pick { display: none; } }
+  .lang-pick { display: flex; align-items: center; gap: 5px; border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; font-size: 13px; color: var(--ink-soft); background: var(--bg-alt); flex: none; }
+  .lang-pick select { border: none; background: none; font: inherit; color: var(--ink); cursor: pointer; }
+  .lang-pick select:focus { outline: none; }
   .icon-btn { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--ink-soft); cursor: pointer; position: relative; flex: none; }
   .role-pill { display: inline-flex; align-items: center; gap: 7px; background: var(--ink); color: var(--bg); border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; white-space: nowrap; }
 
@@ -133,6 +137,7 @@
 
   .two-col { display: grid; grid-template-columns: 1.1fr 1fr; gap: 22px; align-items: start; }
   @media (max-width: 960px) { .two-col { grid-template-columns: 1fr; } }
+  .chart-card svg text { user-select: none; }
 
   .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
   .field label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-faint); }
@@ -206,15 +211,15 @@
       <span>AgriConnect</span>
     </a>
     <nav class="side-nav" id="sideNav">
-      <button type="button" class="side-link active" data-tab="overview"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg> Overview</button>
-      <button type="button" class="side-link" data-tab="produce"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22V11M12 11c0-4.5-4-7-8-7 0 5.5 3 8.5 8 7Z"/><path d="M12 11c0-4 4-6.5 8-6 0 4.5-3 7-8 6Z"/></svg> My Produce</button>
-      <button type="button" class="side-link" data-tab="prices"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/></svg> Market Prices</button>
-      <button type="button" class="side-link" data-tab="offers"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/></svg> Buyer Offers</button>
-      <a href="advisor.html" class="side-link"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.6 4.7L18 9l-4.4 1.3L12 15l-1.6-4.7L6 9l4.4-1.3L12 3z"/></svg> AI Advisor</a>
+      <button type="button" class="side-link active" data-tab="overview"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg> <span data-i18n="dash_overview">Overview</span></button>
+      <button type="button" class="side-link" data-tab="produce"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22V11M12 11c0-4.5-4-7-8-7 0 5.5 3 8.5 8 7Z"/><path d="M12 11c0-4 4-6.5 8-6 0 4.5-3 7-8 6Z"/></svg> <span id="myProduceLabel" data-i18n="dash_my_produce">My Produce</span></button>
+      <button type="button" class="side-link" data-tab="prices"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/></svg> <span data-i18n="dash_market_prices">Market Prices</span></button>
+      <button type="button" class="side-link" data-tab="offers"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/></svg> <span id="buyerOffersLabel" data-i18n="dash_buyer_offers">Buyer Offers</span></button>
+      <a href="advisor.html" class="side-link"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.6 4.7L18 9l-4.4 1.3L12 15l-1.6-4.7L6 9l4.4-1.3L12 3z"/></svg> <span data-i18n="nav_advisor">AI Advisor</span></a>
     </nav>
     <div class="side-foot">
-      <a href="index.html" class="back-link">← Back to site</a>
-      <button type="button" class="side-link" id="signOutBtn" style="color:var(--red-ic);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg> Sign out</button>
+      <a href="index.html" class="back-link" data-i18n="dash_back_to_site">← Back to site</a>
+      <button type="button" class="side-link" id="signOutBtn" style="color:var(--red-ic);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg> <span data-i18n="dash_sign_out">Sign out</span></button>
     </div>
   </aside>
 
@@ -223,92 +228,115 @@
       <a href="index.html" class="icon-btn mobile-back" aria-label="Back to site">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
       </a>
-      <h1 id="topTitle">Overview</h1>
+      <h1 id="topTitle" data-i18n="dash_overview">Overview</h1>
       <label class="district-pick">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
         <select id="districtSelect"><option>Yavatmal, Maharashtra</option><option>Nashik, Maharashtra</option><option>Indore, Madhya Pradesh</option><option>Kota, Rajasthan</option></select>
+      </label>
+      <label class="lang-pick">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></svg>
+        <select id="langSelect"></select>
       </label>
       <button type="button" class="role-pill" id="rolePill"></button>
     </header>
 
     <main class="content">
-      <div class="greet">
-        <div>
-          <h2 id="greetName">Welcome back</h2>
-          <p>Here's what's happening with your produce today.</p>
-        </div>
-        <button type="button" class="btn btn-solid" id="quickAddBtn">+ Add Produce</button>
-      </div>
-
-      <div class="stat-row">
-        <div class="stat-card">
-          <div class="ic" style="background:var(--blue-bg); color:var(--blue-ic);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22V11M12 11c0-4.5-4-7-8-7 0 5.5 3 8.5 8 7Z"/></svg></div>
-          <b class="mono" id="statLots">0</b><span>Active Lots</span>
-        </div>
-        <div class="stat-card">
-          <div class="ic" style="background:var(--amber-bg); color:var(--amber-ic);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/></svg></div>
-          <b class="mono" id="statOffers">3</b><span>Pending Offers</span>
-        </div>
-        <div class="stat-card">
-          <div class="ic" style="background:var(--mint-bg); color:var(--mint-ic);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg></div>
-          <b class="mono up">+1.8%</b><span>Avg Price Trend (7d)</span>
-        </div>
-        <div class="stat-card">
-          <div class="ic" style="background:var(--purple-bg); color:var(--purple-ic);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z"/></svg></div>
-          <b class="mono">₹0</b><span>Escrow This Month</span>
-        </div>
-      </div>
-
-      <!-- OVERVIEW / PRODUCE TAB -->
+      <!-- OVERVIEW TAB (summary + charts) -->
       <section id="tab-overview" data-tabpanel>
+        <div class="greet">
+          <div>
+            <h2 id="greetName">Welcome back</h2>
+            <p id="greetSub" data-i18n="dash_greet_sub">Here's what's happening with your produce today.</p>
+          </div>
+          <button type="button" class="btn btn-solid" id="quickAddBtn" data-i18n="dash_add_produce_btn">+ Add Produce</button>
+        </div>
+
+        <div class="stat-row">
+          <div class="stat-card">
+            <div class="ic" style="background:var(--blue-bg); color:var(--blue-ic);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22V11M12 11c0-4.5-4-7-8-7 0 5.5 3 8.5 8 7Z"/></svg></div>
+            <b class="mono" id="statLots">0</b><span data-i18n="dash_stat_active_lots">Active Lots</span>
+          </div>
+          <div class="stat-card">
+            <div class="ic" style="background:var(--amber-bg); color:var(--amber-ic);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/></svg></div>
+            <b class="mono" id="statOffers">3</b><span data-i18n="dash_stat_pending_offers">Pending Offers</span>
+          </div>
+          <div class="stat-card">
+            <div class="ic" style="background:var(--mint-bg); color:var(--mint-ic);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg></div>
+            <b class="mono up">+1.8%</b><span data-i18n="dash_stat_price_trend">Avg Price Trend (7d)</span>
+          </div>
+          <div class="stat-card">
+            <div class="ic" style="background:var(--purple-bg); color:var(--purple-ic);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z"/></svg></div>
+            <b class="mono">₹0</b><span data-i18n="dash_stat_escrow">Escrow This Month</span>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="panel chart-card">
+            <div class="panel-head"><div><h3 data-i18n="dash_chart_lots_title">Produce by Status</h3><p class="sub" data-i18n="dash_chart_lots_sub">Breakdown of listed lots</p></div></div>
+            <div id="lotsStatusChart"></div>
+          </div>
+          <div class="panel chart-card">
+            <div class="panel-head"><div><h3 data-i18n="dash_chart_offers_title">Offers by Status</h3><p class="sub" data-i18n="dash_chart_offers_sub">How buyer offers are trending</p></div></div>
+            <div id="offersStatusChart"></div>
+          </div>
+        </div>
+
+        <div class="panel chart-card" style="margin-top:22px;">
+          <div class="panel-head"><div><h3 data-i18n="dash_chart_price_title">Market Price Snapshot</h3><p class="sub" data-i18n="dash_chart_price_sub">Live mandi prices near you</p></div></div>
+          <div id="priceSnapshotChart"></div>
+        </div>
+      </section>
+
+      <!-- MY PRODUCE TAB -->
+      <section id="tab-produce" data-tabpanel hidden>
         <div class="two-col">
           <div class="panel" id="addProduceCard">
             <div class="panel-head">
-              <div><h3>Add Produce</h3><p class="sub">List a new lot to get matched with buyers.</p></div>
+              <div><h3 id="addProduceTitle" data-i18n="dash_panel_add_produce">Add Produce</h3><p class="sub" id="addProduceSub" data-i18n="dash_panel_add_produce_sub">List a new lot to get matched with buyers.</p></div>
             </div>
             <form id="lotForm">
               <div class="field-row">
-                <div class="field"><label for="lotCrop">Crop</label><select id="lotCrop" required>
-                  <option value="">Select crop</option><option>Wheat</option><option>Soybean</option><option>Cotton</option><option>Tur</option><option>Onion</option><option>Gram</option>
+                <div class="field"><label for="lotCrop" data-i18n="dash_label_crop">Crop</label><select id="lotCrop" required>
+                  <option value="" data-i18n="dash_select_crop">Select crop</option><option>Wheat</option><option>Soybean</option><option>Cotton</option><option>Tur</option><option>Onion</option><option>Gram</option><option>Mustard</option><option>Maize</option><option>Groundnut</option><option>Sugarcane</option><option>Rice/Paddy</option><option>Bajra</option><option>Jowar</option><option>Chana</option><option>Moong</option><option>Urad</option><option>Sunflower</option><option>Turmeric</option><option>Chilli</option><option>Potato</option><option>Tomato</option>
                 </select></div>
-                <div class="field"><label for="lotQty">Quantity (Q)</label><input id="lotQty" type="number" min="1" placeholder="e.g. 40" required></div>
+                <div class="field"><label for="lotQty" data-i18n="dash_label_qty">Quantity (Q)</label><input id="lotQty" type="number" min="1" placeholder="e.g. 40" required></div>
               </div>
               <div class="field-row">
-                <div class="field"><label for="lotGrade">Quality grade</label><select id="lotGrade" required><option value="">Select grade</option><option>Grade A</option><option>Grade B</option><option>Grade C</option></select></div>
-                <div class="field"><label for="lotLoc">Location</label><input id="lotLoc" type="text" placeholder="e.g. Yavatmal" required></div>
+                <div class="field"><label for="lotGrade" data-i18n="dash_label_grade">Quality grade</label><select id="lotGrade" required><option value="" data-i18n="dash_select_grade">Select grade</option><option>Grade A (FAQ - Premium)</option><option>Grade B (Standard)</option><option>Grade C (Fair Average)</option><option>Grade D (Below Average)</option><option>Ungraded</option></select></div>
+                <div class="field"><label for="lotLoc" data-i18n="dash_label_location">Location</label><input id="lotLoc" type="text" placeholder="e.g. Yavatmal" required></div>
               </div>
-              <button type="submit" class="btn btn-solid" style="width:100%; justify-content:center;">Add lot &amp; get AI recommendation</button>
+              <button type="submit" class="btn btn-solid" style="width:100%; justify-content:center;" data-i18n="dash_submit_lot">Add lot &amp; get AI recommendation</button>
             </form>
             <div class="rec-box" id="recBox">
-              <span class="rt">AI RECOMMENDATION</span>
+              <span class="rt" data-i18n="dash_ai_rec">AI RECOMMENDATION</span>
               <p id="recText"></p>
             </div>
           </div>
 
           <div class="panel">
-            <div class="panel-head"><div><h3>Today's Best Markets</h3><p class="sub">Live mandi prices near you</p></div></div>
-            <table class="price-table" id="miniPriceTable"><thead><tr><th>Market</th><th>Price</th></tr></thead><tbody></tbody></table>
+            <div class="panel-head"><div><h3 data-i18n="dash_panel_best_markets">Today's Best Markets</h3><p class="sub" data-i18n="dash_panel_best_markets_sub">Live mandi prices near you</p></div></div>
+            <table class="price-table" id="miniPriceTable"><thead><tr><th data-i18n="dash_th_market">Market</th><th data-i18n="dash_th_price">Price</th></tr></thead><tbody></tbody></table>
           </div>
         </div>
 
         <div class="panel" style="margin-top:22px;">
-          <div class="panel-head"><div><h3>My Produce</h3><p class="sub">Lots you've listed on AgriConnect</p></div></div>
-          <table id="lotsTable"><thead><tr><th>Crop</th><th>Qty</th><th>Grade</th><th>Location</th><th>Status</th><th></th></tr></thead><tbody id="lotsTableBody"></tbody></table>
+          <div class="panel-head"><div><h3 id="myProduceTitle" data-i18n="dash_my_produce">My Produce</h3><p class="sub" id="myProduceSub" data-i18n="dash_panel_my_produce_sub">Lots you've listed on AgriConnect</p></div></div>
+          <table id="lotsTable"><thead><tr><th data-i18n="dash_th_crop">Crop</th><th data-i18n="dash_th_qty">Qty</th><th data-i18n="dash_th_grade">Grade</th><th data-i18n="dash_th_location">Location</th><th data-i18n="dash_th_status">Status</th><th></th></tr></thead><tbody id="lotsTableBody"></tbody></table>
         </div>
       </section>
 
       <!-- PRICES TAB -->
       <section id="tab-prices" data-tabpanel hidden>
         <div class="panel">
-          <div class="panel-head"><div><h3>Live Mandi Price Index</h3><p class="sub">Updates continuously across nearby markets</p></div></div>
-          <table class="price-table" id="fullPriceTable"><thead><tr><th>Market</th><th>Price</th></tr></thead><tbody></tbody></table>
+          <div class="panel-head"><div><h3 data-i18n="dash_panel_price_index">Live Mandi Price Index</h3><p class="sub" data-i18n="dash_panel_price_index_sub">Updates continuously across nearby markets</p></div></div>
+          <table class="price-table" id="fullPriceTable"><thead><tr><th data-i18n="dash_th_market">Market</th><th data-i18n="dash_th_price">Price</th></tr></thead><tbody></tbody></table>
         </div>
       </section>
 
       <!-- OFFERS TAB -->
       <section id="tab-offers" data-tabpanel hidden>
         <div class="panel">
-          <div class="panel-head"><div><h3>Buyer Offers</h3><p class="sub">Compare and respond to offers on your listed lots</p></div></div>
+          <div class="panel-head"><div><h3 id="buyerOffersTitle" data-i18n="dash_buyer_offers">Buyer Offers</h3><p class="sub" id="buyerOffersSub" data-i18n="dash_panel_offers_sub">Compare and respond to offers on your listed lots</p></div></div>
           <div id="offersList"></div>
         </div>
       </section>
@@ -318,10 +346,10 @@
 </div>
 
 <nav class="mobile-tabbar" id="mobileTabbar" hidden>
-  <button type="button" class="active" data-tab="overview"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Overview</button>
-  <button type="button" data-tab="prices"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg>Prices</button>
-  <button type="button" data-tab="offers"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/></svg>Offers</button>
-  <a href="advisor.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.6 4.7L18 9l-4.4 1.3L12 15l-1.6-4.7L6 9l4.4-1.3L12 3z"/></svg>Advisor</a>
+  <button type="button" class="active" data-tab="overview"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span data-i18n="dash_mobile_overview">Overview</span></button>
+  <button type="button" data-tab="prices"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg><span data-i18n="dash_mobile_prices">Prices</span></button>
+  <button type="button" data-tab="offers"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/></svg><span data-i18n="dash_mobile_offers">Offers</span></button>
+  <a href="advisor.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.6 4.7L18 9l-4.4 1.3L12 15l-1.6-4.7L6 9l4.4-1.3L12 3z"/></svg><span data-i18n="dash_mobile_advisor">Advisor</span></a>
 </nav>
 
 <script>
@@ -338,29 +366,133 @@
     }, 4200);
   }
 
-  var prices = [
+  /* ---------- state ---------- */
+  var state = { user: null, lots: [], offers: [], isAdmin: false, farmers: [] };
+
+  var DEFAULT_PRICES = [
     ["Soybean · Ujjain", 4720, "up"], ["Cotton · Akola", 7280, "up"],
     ["Tur · Latur", 10450, "flat"], ["Wheat · Indore", 2840, "up"],
     ["Onion · Nashik", 1320, "down"], ["Gram · Jaipur", 5340, "up"],
     ["Mustard · Kota", 5610, "down"], ["Maize · Sagar", 2110, "up"]
   ];
-  function priceRows(list) {
+  var PRICE_OVERRIDES_KEY = "agri_admin_price_overrides";
+  function loadPriceOverrides() {
+    try { return JSON.parse(localStorage.getItem(PRICE_OVERRIDES_KEY) || "{}"); } catch (e) { return {}; }
+  }
+  function savePriceOverrides(o) {
+    try { localStorage.setItem(PRICE_OVERRIDES_KEY, JSON.stringify(o)); } catch (e) {}
+  }
+  function getPrices() {
+    var overrides = loadPriceOverrides();
+    return DEFAULT_PRICES.map(function (p) {
+      var o = overrides[p[0]];
+      return o ? [p[0], o.price, o.trend] : p;
+    });
+  }
+  function updatePrice(market, price, trend) {
+    var overrides = loadPriceOverrides();
+    overrides[market] = { price: price, trend: trend };
+    savePriceOverrides(overrides);
+    renderPriceTables();
+  }
+  function priceRows(list, editable) {
     return list.map(function (p) {
       var arrow = p[2] === "up" ? '<span class="up">▲</span>' : p[2] === "down" ? '<span class="down">▼</span>' : "—";
-      return "<tr><td>" + p[0] + "</td><td>₹" + p[1].toLocaleString("en-IN") + "/Q " + arrow + "</td></tr>";
+      if (!editable) {
+        return "<tr><td>" + p[0] + "</td><td>₹" + p[1].toLocaleString("en-IN") + "/Q " + arrow + "</td></tr>";
+      }
+      return "<tr><td>" + p[0] + "</td><td>" +
+        '<span style="display:inline-flex; align-items:center; gap:6px;">₹<input type="number" min="1" value="' + p[1] + '" data-price-market="' + encodeURIComponent(p[0]) + '" style="width:80px; font:inherit; padding:4px 6px; border:1px solid var(--border); border-radius:6px; background:var(--bg-alt); color:var(--ink);">/Q ' +
+        '<select data-trend-market="' + encodeURIComponent(p[0]) + '" style="font:inherit; padding:4px 6px; border:1px solid var(--border); border-radius:6px; background:var(--bg-alt); color:var(--ink);">' +
+        '<option value="up"' + (p[2] === "up" ? " selected" : "") + '>▲ up</option>' +
+        '<option value="flat"' + (p[2] === "flat" ? " selected" : "") + '>— flat</option>' +
+        '<option value="down"' + (p[2] === "down" ? " selected" : "") + '>▼ down</option>' +
+        '</select></span></td></tr>';
     }).join("");
   }
-  document.getElementById("miniPriceTable").querySelector("tbody").innerHTML = priceRows(prices.slice(0, 4));
-  document.getElementById("fullPriceTable").querySelector("tbody").innerHTML = priceRows(prices);
+  function renderPriceTables() {
+    var editable = !!(state.user && state.isAdmin);
+    var list = getPrices();
+    document.getElementById("miniPriceTable").querySelector("tbody").innerHTML = priceRows(list.slice(0, 4), false);
+    document.getElementById("fullPriceTable").querySelector("tbody").innerHTML = priceRows(list, editable);
+    if (editable) {
+      document.getElementById("fullPriceTable").querySelectorAll("[data-price-market]").forEach(function (input) {
+        input.addEventListener("change", function () {
+          var market = decodeURIComponent(input.getAttribute("data-price-market"));
+          var trendSel = document.querySelector('[data-trend-market="' + input.getAttribute("data-price-market") + '"]');
+          updatePrice(market, Number(input.value), trendSel ? trendSel.value : "flat");
+        });
+      });
+      document.getElementById("fullPriceTable").querySelectorAll("[data-trend-market]").forEach(function (sel) {
+        sel.addEventListener("change", function () {
+          var market = decodeURIComponent(sel.getAttribute("data-trend-market"));
+          var priceInput = document.querySelector('[data-price-market="' + sel.getAttribute("data-trend-market") + '"]');
+          updatePrice(market, priceInput ? Number(priceInput.value) : 0, sel.value);
+        });
+      });
+    }
+  }
+  renderPriceTables();
+
+  /* ---------- overview charts (dependency-free inline SVG bar charts) ---------- */
+  function truncateLabel(s, n) { return s && s.length > n ? s.slice(0, n - 1) + "…" : s; }
+  function renderBarChart(elId, data, isCurrency) {
+    var el = document.getElementById(elId);
+    if (!el) return;
+    var hasData = data.some(function (d) { return d.value > 0; });
+    if (!hasData) {
+      el.innerHTML = '<p class="empty-row" style="padding:16px 0;">' + window.AgriI18n.t("dash_chart_empty") + '</p>';
+      return;
+    }
+    var max = Math.max.apply(null, data.map(function (d) { return d.value; }).concat([1]));
+    var barH = 24, gap = 12, labelW = 128, chartW = 200;
+    var svgW = labelW + chartW + 76;
+    var svgH = data.length * (barH + gap);
+    var rows = data.map(function (d, i) {
+      var y = i * (barH + gap);
+      var w = Math.max(3, Math.round((d.value / max) * chartW));
+      var valueText = isCurrency ? "₹" + Number(d.value).toLocaleString("en-IN") : d.value;
+      return '<text x="0" y="' + (y + barH * 0.68) + '" font-size="11.5" fill="var(--ink-soft)" font-family="IBM Plex Sans, sans-serif">' + truncateLabel(String(d.label), 17) + '</text>' +
+        '<rect x="' + labelW + '" y="' + y + '" width="' + w + '" height="' + barH + '" rx="6" style="fill:' + d.color + '"></rect>' +
+        '<text x="' + (labelW + w + 8) + '" y="' + (y + barH * 0.68) + '" font-size="12" fill="var(--ink)" font-family="IBM Plex Mono, monospace">' + valueText + '</text>';
+    }).join("");
+    el.innerHTML = '<svg width="100%" height="' + svgH + '" viewBox="0 0 ' + svgW + ' ' + svgH + '" role="img">' + rows + '</svg>';
+  }
+  function renderOverviewCharts() {
+    var t = window.AgriI18n.t;
+    var statusCounts = { listed: 0, matching: 0, offer: 0, shipped: 0 };
+    (state.lots || []).forEach(function (l) {
+      var key = statusCounts.hasOwnProperty(l.status) ? l.status : "listed";
+      statusCounts[key]++;
+    });
+    renderBarChart("lotsStatusChart", [
+      { label: t("dash_status_listed"), value: statusCounts.listed, color: "var(--blue-ic)" },
+      { label: t("dash_status_matching"), value: statusCounts.matching, color: "var(--amber-ic)" },
+      { label: t("dash_status_offer"), value: statusCounts.offer, color: "var(--mint-ic)" },
+      { label: t("dash_status_shipped"), value: statusCounts.shipped, color: "var(--purple-ic)" }
+    ]);
+
+    var offerCounts = { pending: 0, accepted: 0, rejected: 0 };
+    (state.offers || []).forEach(function (o) {
+      if (offerCounts.hasOwnProperty(o.status)) offerCounts[o.status]++;
+    });
+    renderBarChart("offersStatusChart", [
+      { label: t("dash_status_pending"), value: offerCounts.pending, color: "var(--amber-ic)" },
+      { label: t("dash_status_accepted"), value: offerCounts.accepted, color: "var(--green)" },
+      { label: t("dash_status_rejected"), value: offerCounts.rejected, color: "var(--red-ic)" }
+    ]);
+
+    var top = getPrices().slice(0, 6);
+    renderBarChart("priceSnapshotChart", top.map(function (p) {
+      return { label: p[0], value: p[1], color: p[2] === "up" ? "var(--green)" : p[2] === "down" ? "var(--red-ic)" : "var(--ink-faint)" };
+    }), true);
+  }
 
   /* ---------- supabase ---------- */
   var SUPABASE_URL = "https://zuacwddjassysntscpzy.supabase.co";
   var SUPABASE_KEY = "sb_publishable_De6ugFUdJldaYu5qssrb6w_aIN2iVUT";
   var sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
   var BUYER_POOL = ["Sunita Traders, Pune", "MSWC Warehouse, Nagpur", "AgroFresh Mills, Indore", "Vidarbha AgroCorp", "Krishi Setu FPO"];
-
-  /* ---------- state ---------- */
-  var state = { user: null, lots: [], offers: [] };
 
   var gateWrap = document.getElementById("gateWrap");
   var appShell = document.getElementById("appShell");
@@ -373,30 +505,31 @@
     appShell.hidden = true;
     mobileTabbar.hidden = true;
     var isSignup = gateMode === "signup";
+    var t = window.AgriI18n.t;
     gateWrap.innerHTML =
       '<div class="gate">' +
         '<div class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>' +
-        '<h2>' + (isSignup ? "Create your account" : "Sign in to your dashboard") + '</h2>' +
-        '<p>Your farmer dashboard tracks produce lots, live buyer offers and AI sell recommendations, backed by a real database.</p>' +
+        '<h2>' + (isSignup ? t("gate_create_account") : t("gate_signin_title")) + '</h2>' +
+        '<p>' + t("gate_desc") + '</p>' +
         '<div class="gate-tabs" style="display:flex; gap:8px; margin-top:18px;">' +
-          '<button type="button" class="btn ' + (isSignup ? "btn-solid" : "btn-line") + '" style="flex:1; justify-content:center;" data-gate-mode="signup">Create account</button>' +
-          '<button type="button" class="btn ' + (!isSignup ? "btn-solid" : "btn-line") + '" style="flex:1; justify-content:center;" data-gate-mode="signin">Sign in</button>' +
+          '<button type="button" class="btn ' + (isSignup ? "btn-solid" : "btn-line") + '" style="flex:1; justify-content:center;" data-gate-mode="signup">' + t("gate_tab_create") + '</button>' +
+          '<button type="button" class="btn ' + (!isSignup ? "btn-solid" : "btn-line") + '" style="flex:1; justify-content:center;" data-gate-mode="signin">' + t("gate_tab_signin") + '</button>' +
         '</div>' +
         (errorMsg ? '<p style="color:var(--red-ic); font-size:13px; margin-top:14px;">' + errorMsg + '</p>' : '') +
         '<form id="gateForm" style="margin-top:18px;">' +
           (isSignup
-            ? '<div class="field"><label>I am a</label><div class="role-pick-form">' +
-                '<label><input type="radio" name="role" value="Farmer" checked><span>Farmer</span></label>' +
-                '<label><input type="radio" name="role" value="Buyer"><span>Buyer</span></label>' +
-                '<label><input type="radio" name="role" value="Admin"><span>Admin</span></label>' +
+            ? '<div class="field"><label>' + t("gate_role_label") + '</label><div class="role-pick-form">' +
+                '<label><input type="radio" name="role" value="Farmer" checked><span>' + t("gate_role_farmer") + '</span></label>' +
+                '<label><input type="radio" name="role" value="Buyer"><span>' + t("gate_role_buyer") + '</span></label>' +
+                '<label><input type="radio" name="role" value="Admin"><span>' + t("gate_role_admin") + '</span></label>' +
               '</div></div>' +
-              '<div class="field"><label for="gateName">Name</label><input id="gateName" type="text" placeholder="e.g. Ramesh Patil" required></div>'
+              '<div class="field"><label for="gateName">' + t("gate_name_label") + '</label><input id="gateName" type="text" placeholder="e.g. Ramesh Patil" required></div>'
             : '') +
-          '<div class="field"><label for="gateEmail">Email</label><input id="gateEmail" type="email" placeholder="you@example.com" required></div>' +
-          '<div class="field"><label for="gatePassword">Password</label><input id="gatePassword" type="password" placeholder="At least 6 characters" minlength="6" required></div>' +
-          '<button type="submit" class="btn btn-solid" style="width:100%; justify-content:center;">' + (isSignup ? "Create account & enter dashboard" : "Sign in") + '</button>' +
+          '<div class="field"><label for="gateEmail">' + t("gate_email_label") + '</label><input id="gateEmail" type="email" placeholder="you@example.com" required></div>' +
+          '<div class="field"><label for="gatePassword">' + t("gate_password_label") + '</label><input id="gatePassword" type="password" placeholder="At least 6 characters" minlength="6" required></div>' +
+          '<button type="submit" class="btn btn-solid" style="width:100%; justify-content:center;">' + (isSignup ? t("gate_submit_create") : t("gate_submit_signin")) + '</button>' +
         '</form>' +
-        '<p style="margin-top:16px;"><a href="index.html" class="back-link" style="justify-content:center; display:inline-flex;">← Back to site</a></p>' +
+        '<p style="margin-top:16px;"><a href="index.html" class="back-link" style="justify-content:center; display:inline-flex;">' + t("gate_back") + '</a></p>' +
       '</div>';
 
     gateWrap.querySelectorAll("[data-gate-mode]").forEach(function (btn) {
@@ -450,66 +583,194 @@
     appShell.hidden = false;
     mobileTabbar.hidden = false;
 
+    var t = window.AgriI18n.t;
+    state.isAdmin = state.user.role === "Admin";
+
     document.getElementById("greetName").textContent = "Welcome back, " + state.user.name.split(" ")[0] + " 👋";
     document.getElementById("rolePill").textContent = state.user.name + " · " + state.user.role;
+    document.querySelector(".greet p").textContent = state.isAdmin ? t("dash_admin_greet_sub") : t("dash_greet_sub");
+
+    var myProduceLabel = document.getElementById("myProduceLabel");
+    var myProduceTitle = document.getElementById("myProduceTitle");
+    var buyerOffersLabel = document.getElementById("buyerOffersLabel");
+    var buyerOffersTitle = document.getElementById("buyerOffersTitle");
+    var myProduceSub = document.getElementById("myProduceSub");
+    var buyerOffersSub = document.getElementById("buyerOffersSub");
+    if (state.isAdmin) {
+      if (myProduceLabel) myProduceLabel.textContent = t("dash_all_produce");
+      if (myProduceTitle) myProduceTitle.textContent = t("dash_all_produce");
+      if (buyerOffersLabel) buyerOffersLabel.textContent = t("dash_all_offers");
+      if (buyerOffersTitle) buyerOffersTitle.textContent = t("dash_all_offers");
+      if (myProduceSub) myProduceSub.textContent = t("dash_admin_produce_sub");
+      if (buyerOffersSub) buyerOffersSub.textContent = t("dash_admin_offers_sub");
+      renderAdminAddProduceForm();
+      await loadFarmers();
+      var theadRow = document.querySelector("#lotsTable thead tr");
+      if (theadRow && !theadRow.querySelector("[data-th-farmer]")) {
+        var th = document.createElement("th");
+        th.setAttribute("data-th-farmer", "1");
+        th.setAttribute("data-i18n", "dash_th_farmer");
+        th.textContent = t("dash_th_farmer");
+        theadRow.insertBefore(th, theadRow.firstChild);
+      }
+    } else {
+      if (myProduceLabel) myProduceLabel.setAttribute("data-i18n", "dash_my_produce");
+      if (myProduceTitle) myProduceTitle.setAttribute("data-i18n", "dash_my_produce");
+      if (buyerOffersLabel) buyerOffersLabel.setAttribute("data-i18n", "dash_buyer_offers");
+      if (buyerOffersTitle) buyerOffersTitle.setAttribute("data-i18n", "dash_buyer_offers");
+      if (myProduceSub) myProduceSub.setAttribute("data-i18n", "dash_panel_my_produce_sub");
+      if (buyerOffersSub) buyerOffersSub.setAttribute("data-i18n", "dash_panel_offers_sub");
+      window.AgriI18n.applyI18n();
+    }
 
     await loadLots();
     await loadOffers();
+    renderOverviewCharts();
+  }
+
+  async function loadFarmers() {
+    var { data, error } = await sb.from("profiles").select("id, name").eq("role", "Farmer").order("name");
+    if (error) { toast("Could not load farmer list: " + error.message); return; }
+    state.farmers = data || [];
+    var sel = document.getElementById("lotFarmer");
+    if (sel) {
+      sel.innerHTML = '<option value="">' + window.AgriI18n.t("dash_admin_select_farmer") + '</option>' +
+        state.farmers.map(function (f) { return '<option value="' + f.id + '">' + f.name + '</option>'; }).join("");
+    }
+  }
+
+  function renderAdminAddProduceForm() {
+    var t = window.AgriI18n.t;
+    document.getElementById("addProduceTitle").textContent = t("dash_admin_add_title");
+    document.getElementById("addProduceSub").textContent = t("dash_admin_add_sub");
+    var cropRow = document.getElementById("lotCrop").closest(".field-row");
+    if (cropRow && !document.getElementById("lotFarmer")) {
+      var field = document.createElement("div");
+      field.className = "field";
+      field.innerHTML = '<label for="lotFarmer" data-i18n="dash_label_farmer">' + t("dash_label_farmer") + '</label>' +
+        '<select id="lotFarmer" required><option value="">' + t("dash_admin_select_farmer") + '</option></select>';
+      cropRow.parentNode.insertBefore(field, cropRow);
+    }
   }
 
   async function loadLots() {
-    var { data, error } = await sb.from("lots").select("*").eq("farmer_id", state.user.id).order("created_at", { ascending: false });
+    var query = state.isAdmin
+      ? sb.from("lots").select("*, profiles(name)").order("created_at", { ascending: false })
+      : sb.from("lots").select("*").eq("farmer_id", state.user.id).order("created_at", { ascending: false });
+    var { data, error } = await query;
     if (error) { toast("Could not load produce: " + error.message); return; }
     state.lots = data || [];
     renderLots();
   }
 
   function renderLots() {
+    var t = window.AgriI18n.t;
+    renderOverviewCharts();
     var tbody = document.getElementById("lotsTableBody");
     document.getElementById("statLots").textContent = state.lots.length;
+    var colspan = state.isAdmin ? 7 : 6;
     if (!state.lots.length) {
-      tbody.innerHTML = '<tr><td colspan="6" class="empty-row">No lots yet — add your first produce lot above.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="' + colspan + '" class="empty-row">' + t("dash_empty_lots") + '</td></tr>';
       return;
     }
     tbody.innerHTML = state.lots.map(function (lot) {
-      var chipMap = { matching: ["chip-matching", "Matching Buyers"], offer: ["chip-offer", "Offer Received"], shipped: ["chip-shipped", "In Transit"] };
-      var chipInfo = chipMap[lot.status] || ["chip-listed", "Listed"];
+      var chipMap = {
+        matching: ["chip-matching", t("dash_status_matching")], offer: ["chip-offer", t("dash_status_offer")],
+        shipped: ["chip-shipped", t("dash_status_shipped")]
+      };
+      var chipInfo = chipMap[lot.status] || ["chip-listed", t("dash_status_listed")];
       var chipClass = chipInfo[0], chipText = chipInfo[1];
-      return "<tr><td>" + lot.crop + "</td><td>" + lot.qty + "q</td><td>" + lot.grade + "</td><td>" + lot.location + "</td>" +
+      var farmerCol = state.isAdmin ? "<td>" + (lot.profiles ? lot.profiles.name : "—") + "</td>" : "";
+      var editBtn = state.isAdmin ? '<button type="button" class="btn btn-line btn-sm" data-edit-lot="' + lot.id + '">' + t("dash_edit") + '</button> ' : "";
+      return '<tr data-lot-row="' + lot.id + '">' + farmerCol + "<td>" + lot.crop + "</td><td>" + lot.qty + "q</td><td>" + lot.grade + "</td><td>" + lot.location + "</td>" +
         '<td><span class="chip ' + chipClass + '">' + chipText + "</span></td>" +
-        '<td><button type="button" class="btn btn-line btn-sm" data-remove-lot="' + lot.id + '">Remove</button></td></tr>';
+        '<td>' + editBtn + '<button type="button" class="btn btn-line btn-sm" data-remove-lot="' + lot.id + '">' + t("dash_remove") + '</button></td></tr>';
     }).join("");
   }
 
+  function renderLotEditRow(lot) {
+    var t = window.AgriI18n.t;
+    var row = document.querySelector('[data-lot-row="' + lot.id + '"]');
+    if (!row) return;
+    var farmerCol = state.isAdmin ? "<td>" + (lot.profiles ? lot.profiles.name : "—") + "</td>" : "";
+    row.innerHTML = farmerCol +
+      '<td><input type="text" value="' + lot.crop + '" data-field="crop" style="width:90px; font:inherit; padding:4px 6px; border:1px solid var(--border); border-radius:6px; background:var(--bg-alt); color:var(--ink);"></td>' +
+      '<td><input type="number" value="' + lot.qty + '" data-field="qty" style="width:65px; font:inherit; padding:4px 6px; border:1px solid var(--border); border-radius:6px; background:var(--bg-alt); color:var(--ink);"></td>' +
+      '<td><input type="text" value="' + lot.grade + '" data-field="grade" style="width:80px; font:inherit; padding:4px 6px; border:1px solid var(--border); border-radius:6px; background:var(--bg-alt); color:var(--ink);"></td>' +
+      '<td><input type="text" value="' + lot.location + '" data-field="location" style="width:90px; font:inherit; padding:4px 6px; border:1px solid var(--border); border-radius:6px; background:var(--bg-alt); color:var(--ink);"></td>' +
+      '<td><select data-field="status" style="font:inherit; padding:4px 6px; border:1px solid var(--border); border-radius:6px; background:var(--bg-alt); color:var(--ink);">' +
+        ["matching", "offer", "shipped", "listed"].map(function (s) {
+          return '<option value="' + s + '"' + (lot.status === s ? " selected" : "") + '>' + s + '</option>';
+        }).join("") +
+      '</select></td>' +
+      '<td><button type="button" class="btn btn-solid btn-sm" data-save-lot="' + lot.id + '">' + t("dash_save") + '</button> ' +
+      '<button type="button" class="btn btn-line btn-sm" data-cancel-lot="' + lot.id + '">' + t("dash_cancel") + '</button></td>';
+  }
+
   async function loadOffers() {
-    var { data, error } = await sb.from("offers").select("*, lots!inner(crop, farmer_id)").eq("lots.farmer_id", state.user.id).order("created_at", { ascending: false });
+    var query = state.isAdmin
+      ? sb.from("offers").select("*, lots!inner(crop, farmer_id, profiles(name))").order("created_at", { ascending: false })
+      : sb.from("offers").select("*, lots!inner(crop, farmer_id)").eq("lots.farmer_id", state.user.id).order("created_at", { ascending: false });
+    var { data, error } = await query;
     if (error) { toast("Could not load offers: " + error.message); return; }
     state.offers = data || [];
     renderOffers();
   }
 
   function renderOffers() {
+    var t = window.AgriI18n.t;
+    renderOverviewCharts();
     var wrap = document.getElementById("offersList");
     if (!state.offers.length) {
-      wrap.innerHTML = '<p class="empty-row">No offers yet — add a produce lot to get matched with buyers.</p>';
+      wrap.innerHTML = '<p class="empty-row">' + t("dash_empty_offers") + '</p>';
       document.getElementById("statOffers").textContent = 0;
       return;
     }
     wrap.innerHTML = state.offers.map(function (o) {
       var crop = o.lots ? o.lots.crop : "Lot";
+      var farmerName = state.isAdmin && o.lots && o.lots.profiles ? o.lots.profiles.name : null;
+      var label = farmerName ? crop + " · " + farmerName : crop;
+      var adminEdit = state.isAdmin ? '<button type="button" class="btn btn-line btn-sm" data-edit-offer="' + o.id + '">' + t("dash_edit") + '</button> ' : "";
       if (o.status === "accepted") {
-        return '<div class="offer-card"><div class="offer-left"><b>' + crop + "</b><span>" + o.buyer_name + '</span></div>' +
-          '<span class="chip chip-accepted">Accepted</span>' +
-          '<a href="transport.html?offer=' + o.id + '" class="btn btn-solid btn-sm">Arrange Transport →</a></div>';
+        return '<div class="offer-card" data-offer-row="' + o.id + '"><div class="offer-left"><b>' + label + "</b><span>" + o.buyer_name + '</span></div>' +
+          '<span class="chip chip-accepted">' + t("dash_status_accepted") + '</span>' + adminEdit +
+          '<a href="transport.html?offer=' + o.id + '" class="btn btn-solid btn-sm">' + t("dash_arrange_transport") + '</a></div>';
       }
       if (o.status === "rejected") {
-        return '<div class="offer-card"><div class="offer-left"><b>' + crop + "</b><span>" + o.buyer_name + '</span></div><span class="chip chip-rejected">Rejected</span></div>';
+        return '<div class="offer-card" data-offer-row="' + o.id + '"><div class="offer-left"><b>' + label + "</b><span>" + o.buyer_name + '</span></div><span class="chip chip-rejected">' + t("dash_status_rejected") + '</span>' + adminEdit + '</div>';
       }
-      return '<div class="offer-card"><div class="offer-left"><b>' + crop + "</b><span>" + o.buyer_name + '</span></div>' +
+      return '<div class="offer-card" data-offer-row="' + o.id + '"><div class="offer-left"><b>' + label + "</b><span>" + o.buyer_name + '</span></div>' +
         '<div class="offer-price">₹' + Number(o.price).toLocaleString("en-IN") + "/Q</div>" +
-        '<div class="offer-actions"><button type="button" class="btn btn-line btn-sm" data-reject-offer="' + o.id + '">Decline</button><button type="button" class="btn btn-solid btn-sm" data-accept-offer="' + o.id + '">Accept</button></div></div>';
+        '<div class="offer-actions">' + adminEdit + '<button type="button" class="btn btn-line btn-sm" data-reject-offer="' + o.id + '">' + t("dash_decline") + '</button><button type="button" class="btn btn-solid btn-sm" data-accept-offer="' + o.id + '">' + t("dash_accept") + '</button></div></div>';
     }).join("");
-    document.getElementById("statOffers").textContent = state.offers.filter(function (o) { return o.status === "pending"; }).length;
+    var pendingCount = state.offers.filter(function (o) { return o.status === "pending"; }).length;
+    document.getElementById("statOffers").textContent = state.isAdmin ? state.offers.length : pendingCount;
+    if (state.isAdmin) {
+      var accepted = state.offers.filter(function (o) { return o.status === "accepted"; });
+      var escrowSum = accepted.reduce(function (sum, o) { return sum + Number(o.price || 0); }, 0);
+      var escrowEl = document.querySelector(".stat-card:nth-child(4) b");
+      if (escrowEl) escrowEl.textContent = "₹" + escrowSum.toLocaleString("en-IN");
+    }
+  }
+
+  function renderOfferEditRow(offer) {
+    var t = window.AgriI18n.t;
+    var row = document.querySelector('[data-offer-row="' + offer.id + '"]');
+    if (!row) return;
+    var crop = offer.lots ? offer.lots.crop : "Lot";
+    var farmerName = offer.lots && offer.lots.profiles ? offer.lots.profiles.name : null;
+    var label = farmerName ? crop + " · " + farmerName : crop;
+    row.innerHTML =
+      '<div class="offer-left"><b>' + label + '</b>' +
+      '<input type="text" value="' + offer.buyer_name + '" data-field="buyer_name" style="margin-top:4px; font:inherit; font-size:12.5px; padding:4px 6px; border:1px solid var(--border); border-radius:6px; background:var(--bg-alt); color:var(--ink); width:160px;"></div>' +
+      '<span style="display:inline-flex; align-items:center; gap:4px;">₹<input type="number" value="' + offer.price + '" data-field="price" style="width:80px; font:inherit; padding:4px 6px; border:1px solid var(--border); border-radius:6px; background:var(--bg-alt); color:var(--ink);"></span>' +
+      '<select data-field="status" style="font:inherit; padding:4px 6px; border:1px solid var(--border); border-radius:6px; background:var(--bg-alt); color:var(--ink);">' +
+        ["pending", "accepted", "rejected"].map(function (s) {
+          return '<option value="' + s + '"' + (offer.status === s ? " selected" : "") + '>' + s + '</option>';
+        }).join("") +
+      '</select>' +
+      '<div class="offer-actions"><button type="button" class="btn btn-solid btn-sm" data-save-offer="' + offer.id + '">' + t("dash_save") + '</button> ' +
+      '<button type="button" class="btn btn-line btn-sm" data-cancel-offer="' + offer.id + '">' + t("dash_cancel") + '</button></div>';
   }
 
   document.addEventListener("click", async function (e) {
@@ -520,6 +781,46 @@
       if (error) { toast("Could not remove lot: " + error.message); return; }
       toast("Lot removed.");
       await loadLots(); await loadOffers();
+      return;
+    }
+    var editLot = e.target.closest("[data-edit-lot]");
+    if (editLot) {
+      var lot = state.lots.find(function (l) { return l.id === editLot.getAttribute("data-edit-lot"); });
+      if (lot) renderLotEditRow(lot);
+      return;
+    }
+    var cancelLot = e.target.closest("[data-cancel-lot]");
+    if (cancelLot) { renderLots(); return; }
+    var saveLot = e.target.closest("[data-save-lot]");
+    if (saveLot) {
+      var lotId2 = saveLot.getAttribute("data-save-lot");
+      var row = document.querySelector('[data-lot-row="' + lotId2 + '"]');
+      var updates = {};
+      row.querySelectorAll("[data-field]").forEach(function (input) { updates[input.getAttribute("data-field")] = input.value; });
+      var { error: updErr } = await sb.from("lots").update(updates).eq("id", lotId2);
+      if (updErr) { toast("Could not update lot: " + updErr.message); return; }
+      toast("Lot updated.");
+      await loadLots(); await loadOffers();
+      return;
+    }
+    var editOffer = e.target.closest("[data-edit-offer]");
+    if (editOffer) {
+      var offer = state.offers.find(function (o) { return o.id === editOffer.getAttribute("data-edit-offer"); });
+      if (offer) renderOfferEditRow(offer);
+      return;
+    }
+    var cancelOffer = e.target.closest("[data-cancel-offer]");
+    if (cancelOffer) { renderOffers(); return; }
+    var saveOffer = e.target.closest("[data-save-offer]");
+    if (saveOffer) {
+      var offerId2 = saveOffer.getAttribute("data-save-offer");
+      var orow = document.querySelector('[data-offer-row="' + offerId2 + '"]');
+      var oupdates = {};
+      orow.querySelectorAll("[data-field]").forEach(function (input) { oupdates[input.getAttribute("data-field")] = input.value; });
+      var { error: oUpdErr } = await sb.from("offers").update(oupdates).eq("id", offerId2);
+      if (oUpdErr) { toast("Could not update offer: " + oUpdErr.message); return; }
+      toast("Offer updated.");
+      await loadOffers();
       return;
     }
     var acc = e.target.closest("[data-accept-offer]");
@@ -549,9 +850,17 @@
     var qty = document.getElementById("lotQty").value;
     var grade = document.getElementById("lotGrade").value;
     var loc = document.getElementById("lotLoc").value;
+    var farmerSel = document.getElementById("lotFarmer");
+
+    if (state.isAdmin && (!farmerSel || !farmerSel.value)) {
+      submitBtn.disabled = false;
+      toast("Please select a farmer.");
+      return;
+    }
+    var targetFarmerId = state.isAdmin ? farmerSel.value : state.user.id;
 
     var { data: newLot, error } = await sb.from("lots").insert({
-      farmer_id: state.user.id, crop: crop, qty: qty, grade: grade, location: loc, status: "matching"
+      farmer_id: targetFarmerId, crop: crop, qty: qty, grade: grade, location: loc, status: "matching"
     }).select().single();
 
     submitBtn.disabled = false;
@@ -565,13 +874,15 @@
 
     await loadLots(); await loadOffers();
 
-    var hold = Math.random() > 0.5;
-    var recBox = document.getElementById("recBox");
-    var recText = document.getElementById("recText");
-    recText.textContent = hold
-      ? "Hold for 3–4 days: " + crop + " prices are trending up (~+3–5%) in nearby mandis. Selling now would leave value on the table."
-      : "Sell now: " + crop + " prices are at a seasonal high in your district — waiting risks a pullback. Best matched buyer offers ₹" + basePrice + "/Q net.";
-    recBox.classList.add("show");
+    if (!state.isAdmin) {
+      var hold = Math.random() > 0.5;
+      var recBox = document.getElementById("recBox");
+      var recText = document.getElementById("recText");
+      recText.textContent = hold
+        ? "Hold for 3–4 days: " + crop + " prices are trending up (~+3–5%) in nearby mandis. Selling now would leave value on the table."
+        : "Sell now: " + crop + " prices are at a seasonal high in your district — waiting risks a pullback. Best matched buyer offers ₹" + basePrice + "/Q net.";
+      recBox.classList.add("show");
+    }
     this.reset();
     toast(crop + " · " + qty + "q listed. Matched with " + shuffled.length + " verified buyers.");
   });
@@ -590,22 +901,48 @@
   });
 
   document.getElementById("quickAddBtn").addEventListener("click", function () {
-    setTab("overview");
+    setTab("produce");
     document.getElementById("addProduceCard").scrollIntoView({ behavior: "smooth", block: "start" });
     document.getElementById("lotCrop").focus();
   });
 
   /* ---------- tabs ---------- */
-  var tabTitles = { overview: "Overview", produce: "Overview", prices: "Market Prices", offers: "Buyer Offers" };
+  function tabTitleFor(tab) {
+    var t = window.AgriI18n.t;
+    if (tab === "prices") return t("dash_market_prices");
+    if (tab === "offers") return state.isAdmin ? t("dash_all_offers") : t("dash_buyer_offers");
+    if (tab === "produce") return state.isAdmin ? t("dash_all_produce") : t("dash_my_produce");
+    return t("dash_overview");
+  }
+  var currentTab = "overview";
   function setTab(tab) {
-    if (tab === "produce") tab = "overview";
+    currentTab = tab;
     document.querySelectorAll("[data-tabpanel]").forEach(function (p) { p.hidden = p.id !== "tab-" + tab; });
     document.querySelectorAll(".side-link[data-tab]").forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-tab") === tab); });
     document.querySelectorAll(".mobile-tabbar button[data-tab]").forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-tab") === tab); });
-    document.getElementById("topTitle").textContent = tabTitles[tab] || "Overview";
+    document.getElementById("topTitle").textContent = tabTitleFor(tab);
+    if (tab === "overview") renderOverviewCharts();
   }
   document.querySelectorAll(".side-link[data-tab], .mobile-tabbar button[data-tab]").forEach(function (b) {
     b.addEventListener("click", function () { setTab(b.getAttribute("data-tab")); });
+  });
+
+  /* ---------- language change ---------- */
+  document.addEventListener("agri:langchange", function () {
+    renderPriceTables();
+    if (state.user) {
+      document.getElementById("topTitle").textContent = tabTitleFor(currentTab);
+      renderLots();
+      renderOffers();
+      if (state.isAdmin) {
+        document.getElementById("addProduceTitle").textContent = window.AgriI18n.t("dash_admin_add_title");
+        document.getElementById("addProduceSub").textContent = window.AgriI18n.t("dash_admin_add_sub");
+        var lf = document.getElementById("lotFarmer");
+        if (lf) lf.options[0].textContent = window.AgriI18n.t("dash_admin_select_farmer");
+      }
+    } else if (!gateWrap.hidden) {
+      renderGate();
+    }
   });
 
   /* ---------- boot ---------- */
