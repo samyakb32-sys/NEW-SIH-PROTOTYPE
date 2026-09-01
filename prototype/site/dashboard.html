@@ -137,6 +137,7 @@
 
   .two-col { display: grid; grid-template-columns: 1.1fr 1fr; gap: 22px; align-items: start; }
   @media (max-width: 960px) { .two-col { grid-template-columns: 1fr; } }
+  .chart-card svg text { user-select: none; }
 
   .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
   .field label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-faint); }
@@ -240,35 +241,54 @@
     </header>
 
     <main class="content">
-      <div class="greet">
-        <div>
-          <h2 id="greetName">Welcome back</h2>
-          <p data-i18n="dash_greet_sub">Here's what's happening with your produce today.</p>
-        </div>
-        <button type="button" class="btn btn-solid" id="quickAddBtn" data-i18n="dash_add_produce_btn">+ Add Produce</button>
-      </div>
-
-      <div class="stat-row">
-        <div class="stat-card">
-          <div class="ic" style="background:var(--blue-bg); color:var(--blue-ic);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22V11M12 11c0-4.5-4-7-8-7 0 5.5 3 8.5 8 7Z"/></svg></div>
-          <b class="mono" id="statLots">0</b><span data-i18n="dash_stat_active_lots">Active Lots</span>
-        </div>
-        <div class="stat-card">
-          <div class="ic" style="background:var(--amber-bg); color:var(--amber-ic);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/></svg></div>
-          <b class="mono" id="statOffers">3</b><span data-i18n="dash_stat_pending_offers">Pending Offers</span>
-        </div>
-        <div class="stat-card">
-          <div class="ic" style="background:var(--mint-bg); color:var(--mint-ic);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg></div>
-          <b class="mono up">+1.8%</b><span data-i18n="dash_stat_price_trend">Avg Price Trend (7d)</span>
-        </div>
-        <div class="stat-card">
-          <div class="ic" style="background:var(--purple-bg); color:var(--purple-ic);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z"/></svg></div>
-          <b class="mono">₹0</b><span data-i18n="dash_stat_escrow">Escrow This Month</span>
-        </div>
-      </div>
-
-      <!-- OVERVIEW / PRODUCE TAB -->
+      <!-- OVERVIEW TAB (summary + charts) -->
       <section id="tab-overview" data-tabpanel>
+        <div class="greet">
+          <div>
+            <h2 id="greetName">Welcome back</h2>
+            <p id="greetSub" data-i18n="dash_greet_sub">Here's what's happening with your produce today.</p>
+          </div>
+          <button type="button" class="btn btn-solid" id="quickAddBtn" data-i18n="dash_add_produce_btn">+ Add Produce</button>
+        </div>
+
+        <div class="stat-row">
+          <div class="stat-card">
+            <div class="ic" style="background:var(--blue-bg); color:var(--blue-ic);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22V11M12 11c0-4.5-4-7-8-7 0 5.5 3 8.5 8 7Z"/></svg></div>
+            <b class="mono" id="statLots">0</b><span data-i18n="dash_stat_active_lots">Active Lots</span>
+          </div>
+          <div class="stat-card">
+            <div class="ic" style="background:var(--amber-bg); color:var(--amber-ic);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/></svg></div>
+            <b class="mono" id="statOffers">3</b><span data-i18n="dash_stat_pending_offers">Pending Offers</span>
+          </div>
+          <div class="stat-card">
+            <div class="ic" style="background:var(--mint-bg); color:var(--mint-ic);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg></div>
+            <b class="mono up">+1.8%</b><span data-i18n="dash_stat_price_trend">Avg Price Trend (7d)</span>
+          </div>
+          <div class="stat-card">
+            <div class="ic" style="background:var(--purple-bg); color:var(--purple-ic);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z"/></svg></div>
+            <b class="mono">₹0</b><span data-i18n="dash_stat_escrow">Escrow This Month</span>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="panel chart-card">
+            <div class="panel-head"><div><h3 data-i18n="dash_chart_lots_title">Produce by Status</h3><p class="sub" data-i18n="dash_chart_lots_sub">Breakdown of listed lots</p></div></div>
+            <div id="lotsStatusChart"></div>
+          </div>
+          <div class="panel chart-card">
+            <div class="panel-head"><div><h3 data-i18n="dash_chart_offers_title">Offers by Status</h3><p class="sub" data-i18n="dash_chart_offers_sub">How buyer offers are trending</p></div></div>
+            <div id="offersStatusChart"></div>
+          </div>
+        </div>
+
+        <div class="panel chart-card" style="margin-top:22px;">
+          <div class="panel-head"><div><h3 data-i18n="dash_chart_price_title">Market Price Snapshot</h3><p class="sub" data-i18n="dash_chart_price_sub">Live mandi prices near you</p></div></div>
+          <div id="priceSnapshotChart"></div>
+        </div>
+      </section>
+
+      <!-- MY PRODUCE TAB -->
+      <section id="tab-produce" data-tabpanel hidden>
         <div class="two-col">
           <div class="panel" id="addProduceCard">
             <div class="panel-head">
@@ -414,6 +434,60 @@
   }
   renderPriceTables();
 
+  /* ---------- overview charts (dependency-free inline SVG bar charts) ---------- */
+  function truncateLabel(s, n) { return s && s.length > n ? s.slice(0, n - 1) + "…" : s; }
+  function renderBarChart(elId, data, isCurrency) {
+    var el = document.getElementById(elId);
+    if (!el) return;
+    var hasData = data.some(function (d) { return d.value > 0; });
+    if (!hasData) {
+      el.innerHTML = '<p class="empty-row" style="padding:16px 0;">' + window.AgriI18n.t("dash_chart_empty") + '</p>';
+      return;
+    }
+    var max = Math.max.apply(null, data.map(function (d) { return d.value; }).concat([1]));
+    var barH = 24, gap = 12, labelW = 128, chartW = 200;
+    var svgW = labelW + chartW + 76;
+    var svgH = data.length * (barH + gap);
+    var rows = data.map(function (d, i) {
+      var y = i * (barH + gap);
+      var w = Math.max(3, Math.round((d.value / max) * chartW));
+      var valueText = isCurrency ? "₹" + Number(d.value).toLocaleString("en-IN") : d.value;
+      return '<text x="0" y="' + (y + barH * 0.68) + '" font-size="11.5" fill="var(--ink-soft)" font-family="IBM Plex Sans, sans-serif">' + truncateLabel(String(d.label), 17) + '</text>' +
+        '<rect x="' + labelW + '" y="' + y + '" width="' + w + '" height="' + barH + '" rx="6" style="fill:' + d.color + '"></rect>' +
+        '<text x="' + (labelW + w + 8) + '" y="' + (y + barH * 0.68) + '" font-size="12" fill="var(--ink)" font-family="IBM Plex Mono, monospace">' + valueText + '</text>';
+    }).join("");
+    el.innerHTML = '<svg width="100%" height="' + svgH + '" viewBox="0 0 ' + svgW + ' ' + svgH + '" role="img">' + rows + '</svg>';
+  }
+  function renderOverviewCharts() {
+    var t = window.AgriI18n.t;
+    var statusCounts = { listed: 0, matching: 0, offer: 0, shipped: 0 };
+    (state.lots || []).forEach(function (l) {
+      var key = statusCounts.hasOwnProperty(l.status) ? l.status : "listed";
+      statusCounts[key]++;
+    });
+    renderBarChart("lotsStatusChart", [
+      { label: t("dash_status_listed"), value: statusCounts.listed, color: "var(--blue-ic)" },
+      { label: t("dash_status_matching"), value: statusCounts.matching, color: "var(--amber-ic)" },
+      { label: t("dash_status_offer"), value: statusCounts.offer, color: "var(--mint-ic)" },
+      { label: t("dash_status_shipped"), value: statusCounts.shipped, color: "var(--purple-ic)" }
+    ]);
+
+    var offerCounts = { pending: 0, accepted: 0, rejected: 0 };
+    (state.offers || []).forEach(function (o) {
+      if (offerCounts.hasOwnProperty(o.status)) offerCounts[o.status]++;
+    });
+    renderBarChart("offersStatusChart", [
+      { label: t("dash_status_pending"), value: offerCounts.pending, color: "var(--amber-ic)" },
+      { label: t("dash_status_accepted"), value: offerCounts.accepted, color: "var(--green)" },
+      { label: t("dash_status_rejected"), value: offerCounts.rejected, color: "var(--red-ic)" }
+    ]);
+
+    var top = getPrices().slice(0, 6);
+    renderBarChart("priceSnapshotChart", top.map(function (p) {
+      return { label: p[0], value: p[1], color: p[2] === "up" ? "var(--green)" : p[2] === "down" ? "var(--red-ic)" : "var(--ink-faint)" };
+    }), true);
+  }
+
   /* ---------- supabase ---------- */
   var SUPABASE_URL = "https://zuacwddjassysntscpzy.supabase.co";
   var SUPABASE_KEY = "sb_publishable_De6ugFUdJldaYu5qssrb6w_aIN2iVUT";
@@ -551,6 +625,7 @@
 
     await loadLots();
     await loadOffers();
+    renderOverviewCharts();
   }
 
   async function loadFarmers() {
@@ -590,6 +665,7 @@
 
   function renderLots() {
     var t = window.AgriI18n.t;
+    renderOverviewCharts();
     var tbody = document.getElementById("lotsTableBody");
     document.getElementById("statLots").textContent = state.lots.length;
     var colspan = state.isAdmin ? 7 : 6;
@@ -643,6 +719,7 @@
 
   function renderOffers() {
     var t = window.AgriI18n.t;
+    renderOverviewCharts();
     var wrap = document.getElementById("offersList");
     if (!state.offers.length) {
       wrap.innerHTML = '<p class="empty-row">' + t("dash_empty_offers") + '</p>';
@@ -824,7 +901,7 @@
   });
 
   document.getElementById("quickAddBtn").addEventListener("click", function () {
-    setTab("overview");
+    setTab("produce");
     document.getElementById("addProduceCard").scrollIntoView({ behavior: "smooth", block: "start" });
     document.getElementById("lotCrop").focus();
   });
@@ -834,16 +911,17 @@
     var t = window.AgriI18n.t;
     if (tab === "prices") return t("dash_market_prices");
     if (tab === "offers") return state.isAdmin ? t("dash_all_offers") : t("dash_buyer_offers");
-    return state.isAdmin ? t("dash_all_produce") : t("dash_overview");
+    if (tab === "produce") return state.isAdmin ? t("dash_all_produce") : t("dash_my_produce");
+    return t("dash_overview");
   }
   var currentTab = "overview";
   function setTab(tab) {
-    if (tab === "produce") tab = "overview";
     currentTab = tab;
     document.querySelectorAll("[data-tabpanel]").forEach(function (p) { p.hidden = p.id !== "tab-" + tab; });
     document.querySelectorAll(".side-link[data-tab]").forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-tab") === tab); });
     document.querySelectorAll(".mobile-tabbar button[data-tab]").forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-tab") === tab); });
     document.getElementById("topTitle").textContent = tabTitleFor(tab);
+    if (tab === "overview") renderOverviewCharts();
   }
   document.querySelectorAll(".side-link[data-tab], .mobile-tabbar button[data-tab]").forEach(function (b) {
     b.addEventListener("click", function () { setTab(b.getAttribute("data-tab")); });
