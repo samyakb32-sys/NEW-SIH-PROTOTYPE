@@ -400,7 +400,7 @@
     <button type="button" class="chip-btn chip-voice" id="voiceBtnMobile" style="justify-content:center;">Voice Assistant</button>
     <button type="button" class="chip-btn chip-advisor" data-open-modal="advisor" style="justify-content:center;">AI Advisor</button>
     <button type="button" class="btn btn-line" data-open-modal="signin">Sign in</button>
-    <button type="button" class="btn btn-solid" data-open-modal="list">Enter Farmer Dashboard</button>
+    <a href="dashboard.html" class="btn btn-solid">Enter Farmer Dashboard</a>
   </div>
 </aside>
 
@@ -423,7 +423,7 @@
         <p>« Where, when and to whom should I sell my produce to get the best possible NET realization? »</p>
       </div>
       <div class="hero-ctas">
-        <button type="button" class="btn btn-solid btn-lg" data-open-modal="list">→ Enter Farmer Dashboard</button>
+        <a href="dashboard.html" class="btn btn-solid btn-lg">→ Enter Farmer Dashboard</a>
         <button type="button" class="btn btn-onDark btn-lg" id="exploreMarketsBtn">↗ Explore Live Markets</button>
       </div>
     </div>
@@ -572,7 +572,7 @@
     <div class="wrap final-cta reveal">
       <h2>Ready to experience AgriConnect?</h2>
       <p>Start the demo journey as a farmer, explore price predictions, and match buyers.</p>
-      <button type="button" class="btn btn-solid btn-lg" data-open-modal="list">→ Enter Farmer Dashboard</button>
+      <a href="dashboard.html" class="btn btn-solid btn-lg">→ Enter Farmer Dashboard</a>
     </div>
   </section>
 </main>
@@ -759,7 +759,7 @@
     docs: {
       title: "Documentation",
       sub: "Getting started with the prototype",
-      body: '<h4>For farmers</h4><ul><li>Click <b>Enter Farmer Dashboard</b> to add a crop lot</li><li>Check Explore Live Markets for today\'s best mandi</li></ul>'
+      body: '<h4>For farmers</h4><ul><li>Click <b>Enter Farmer Dashboard</b> to open your dashboard and add a crop lot</li><li>Check Explore Live Markets for today\'s best mandi</li></ul>'
         + '<h4>For buyers</h4><ul><li>Sign in as a Buyer to unlock demand posting (in the full build)</li></ul>'
         + '<p class="form-note">This is a static hackathon prototype — full API docs ship with the production build.</p>'
     },
@@ -798,21 +798,6 @@
       + '</form>';
   }
 
-  function renderList() {
-    return '<span class="badge-eyebrow">Farmer Dashboard</span>'
-      + '<h3 id="modalTitle">List your produce</h3>'
-      + '<p class="modal-sub">Add a lot — it lands on the buyer discovery board.</p>'
-      + '<form id="listForm">'
-      + '<div class="field"><label for="lotCrop">Crop</label><select id="lotCrop" required>'
-      + '<option value="">Select crop</option><option>Wheat</option><option>Soybean</option><option>Cotton</option><option>Tur</option><option>Onion</option><option>Gram</option>'
-      + '</select></div>'
-      + '<div class="field"><label for="lotQty">Quantity (quintal)</label><input id="lotQty" type="number" min="1" placeholder="e.g. 40" required></div>'
-      + '<div class="field"><label for="lotGrade">Quality grade</label><select id="lotGrade" required><option value="">Select grade</option><option>Grade A</option><option>Grade B</option><option>Grade C</option></select></div>'
-      + '<div class="field"><label for="lotLoc">Location</label><input id="lotLoc" type="text" placeholder="e.g. Yavatmal, Maharashtra" required></div>'
-      + '<button type="submit" class="btn btn-solid btn-lg">Add lot &amp; get AI recommendation</button>'
-      + '</form>';
-  }
-
   function renderContact() {
     return '<span class="badge-eyebrow">Support</span>'
       + '<h3 id="modalTitle">Contact us</h3>'
@@ -834,7 +819,6 @@
     lastFocused = document.activeElement;
     var html;
     if (key === "signin") html = renderSignin();
-    else if (key === "list") html = renderList();
     else if (key === "contact") html = renderContact();
     else if (infoModals[key]) html = renderInfo(key);
     else return;
@@ -869,16 +853,6 @@
       state.user = { name: name, role: role };
       saveState(); refreshUI(); closeModal();
       toast("Signed in as " + name + " (" + role + ").");
-    } else if (formId === "listForm") {
-      var lot = {
-        crop: document.getElementById("lotCrop").value,
-        qty: document.getElementById("lotQty").value,
-        grade: document.getElementById("lotGrade").value,
-        loc: document.getElementById("lotLoc").value
-      };
-      state.lots.push(lot);
-      saveState(); closeModal();
-      toast(lot.crop + " · " + lot.qty + "q listed from " + lot.loc + ". AI recommendation: hold 3 days for a projected +4% price move.");
     } else if (formId === "contactForm") {
       var nm = document.getElementById("cName").value.trim();
       closeModal();

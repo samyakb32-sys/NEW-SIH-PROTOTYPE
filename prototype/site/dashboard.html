@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard — AgriConnect</title>
+<meta name="description" content="AgriConnect Farmer Dashboard — manage produce lots, track buyer offers, and get AI sell recommendations.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --bg-alt: #eef1f4;
+    --card: #ffffff;
+    --border: #e3e7ec;
+    --ink: #12181f;
+    --ink-soft: #5b6472;
+    --ink-faint: #8b93a1;
+    --green: #16a34a;
+    --green-deep: #14532d;
+    --green-bg: #e8f8ee;
+    --mint-bg: #e8f8ee; --mint-ic: #0f9d58;
+    --blue-bg: #eaf1ff; --blue-ic: #2563eb;
+    --purple-bg: #f2edff; --purple-ic: #7c3aed;
+    --amber-bg: #fff4e0; --amber-ic: #b45309;
+    --teal-bg: #e6f9f7; --teal-ic: #0f9488;
+    --red-bg: #fdecec; --red-ic: #c0392b;
+    --navy: #0e1420;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0c0f14; --bg-alt: #11151c; --card: #151a22; --border: #262c37;
+      --ink: #eef1f5; --ink-soft: #a2acb9; --ink-faint: #6b7482;
+      --mint-bg: #103524; --mint-ic: #34d399; --blue-bg: #10233f; --blue-ic: #60a5fa;
+      --purple-bg: #241a3f; --purple-ic: #a78bfa; --amber-bg: #3a2a0d; --amber-ic: #f2b34d;
+      --teal-bg: #0e2e2a; --teal-ic: #2dd4bf; --red-bg: #341313; --red-ic: #f27272;
+      --navy: #05070b;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0c0f14; --bg-alt: #11151c; --card: #151a22; --border: #262c37;
+    --ink: #eef1f5; --ink-soft: #a2acb9; --ink-faint: #6b7482;
+    --mint-bg: #103524; --mint-ic: #34d399; --blue-bg: #10233f; --blue-ic: #60a5fa;
+    --purple-bg: #241a3f; --purple-ic: #a78bfa; --amber-bg: #3a2a0d; --amber-ic: #f2b34d;
+    --teal-bg: #0e2e2a; --teal-ic: #2dd4bf; --red-bg: #341313; --red-ic: #f27272;
+    --navy: #05070b;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { overflow-x: hidden; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, sans-serif; font-size: 15.5px; line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 { font-family: "IBM Plex Sans", system-ui, sans-serif; margin: 0; color: var(--ink); font-weight: 700; letter-spacing: -0.01em; text-wrap: balance; }
+  .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+  a { color: inherit; }
+  button { font: inherit; }
+  *:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+
+  .shell { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+  .shell[hidden] { display: none; }
+  @media (max-width: 900px) { .shell { grid-template-columns: 1fr; } }
+
+  /* ---------- sidebar ---------- */
+  .sidebar {
+    background: var(--card); border-right: 1px solid var(--border);
+    padding: 20px 16px; display: flex; flex-direction: column; gap: 22px;
+    position: sticky; top: 0; height: 100vh;
+  }
+  @media (max-width: 900px) { .sidebar { display: none; } }
+  .brand-mini { display: flex; align-items: center; gap: 10px; padding: 0 6px; text-decoration: none; }
+  .brand-mini .mark { width: 32px; height: 32px; border-radius: 9px; background: var(--green); display: grid; place-items: center; flex: none; }
+  .brand-mini span { font-weight: 700; font-size: 15.5px; }
+  .side-nav { display: flex; flex-direction: column; gap: 2px; }
+  .side-link {
+    display: flex; align-items: center; gap: 10px; padding: 10px 10px; border-radius: 9px;
+    color: var(--ink-soft); text-decoration: none; font-size: 14px; font-weight: 500; cursor: pointer; border: none; background: none; text-align: left; width: 100%;
+  }
+  .side-link:hover { background: var(--bg-alt); color: var(--ink); }
+  .side-link.active { background: var(--mint-bg); color: var(--mint-ic); font-weight: 600; }
+  .side-link svg { flex: none; }
+  .side-foot { margin-top: auto; border-top: 1px solid var(--border); padding-top: 14px; }
+  .back-link { display: flex; align-items: center; gap: 8px; color: var(--ink-faint); text-decoration: none; font-size: 13px; padding: 8px 10px; }
+  .back-link:hover { color: var(--ink); }
+
+  /* ---------- topbar ---------- */
+  .topbar {
+    position: sticky; top: 0; z-index: 30; background: var(--card); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 14px; padding: 12px 22px;
+  }
+  .topbar .mobile-back { display: none; }
+  @media (max-width: 900px) { .topbar .mobile-back { display: inline-flex; } }
+  .topbar h1 { font-size: 17px; flex: 1; }
+  .district-pick { display: flex; align-items: center; gap: 7px; border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px; font-size: 13px; color: var(--ink-soft); background: var(--bg-alt); }
+  .district-pick select { border: none; background: none; font: inherit; color: var(--ink); cursor: pointer; }
+  .district-pick select:focus { outline: none; }
+  @media (max-width: 640px) { .district-pick { display: none; } }
+  .icon-btn { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--ink-soft); cursor: pointer; position: relative; flex: none; }
+  .role-pill { display: inline-flex; align-items: center; gap: 7px; background: var(--ink); color: var(--bg); border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; white-space: nowrap; }
+
+  /* ---------- content ---------- */
+  .content { padding: 26px 22px 60px; max-width: 1100px; width: 100%; margin: 0 auto; }
+  .btn { font-weight: 600; font-size: 14px; padding: 11px 20px; border-radius: 10px; cursor: pointer; border: 1px solid transparent; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+  .btn-solid { background: var(--green); color: #fff; }
+  .btn-solid:hover { background: var(--green-deep); }
+  .btn-line { border-color: var(--border); color: var(--ink); background: var(--card); }
+  .btn-line:hover { border-color: var(--ink-faint); }
+  .btn-sm { padding: 7px 12px; font-size: 12.5px; border-radius: 7px; }
+  .btn-danger-line { border-color: var(--red-ic); color: var(--red-ic); background: var(--card); }
+  .btn-danger-line:hover { background: var(--red-bg); }
+
+  .badge-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-family: "IBM Plex Mono", monospace; font-size: 11.5px; letter-spacing: .05em; padding: 6px 13px; border-radius: 999px; background: var(--mint-bg); color: var(--mint-ic); font-weight: 600; }
+
+  .greet { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; margin-bottom: 26px; }
+  .greet h2 { font-size: clamp(1.4rem, 2.6vw, 1.8rem); }
+  .greet p { color: var(--ink-soft); font-size: 14px; margin-top: 4px; }
+
+  .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 30px; }
+  @media (max-width: 860px) { .stat-row { grid-template-columns: repeat(2, 1fr); } }
+  .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; }
+  .stat-card .ic { width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; margin-bottom: 12px; }
+  .stat-card b { display: block; font-size: 22px; font-family: "IBM Plex Mono", monospace; }
+  .stat-card span { font-size: 12.5px; color: var(--ink-soft); }
+
+  .panel { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 22px; }
+  .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
+  .panel-head h3 { font-size: 16.5px; }
+  .panel-head p.sub { color: var(--ink-soft); font-size: 13px; margin-top: 3px; }
+
+  .two-col { display: grid; grid-template-columns: 1.1fr 1fr; gap: 22px; align-items: start; }
+  @media (max-width: 960px) { .two-col { grid-template-columns: 1fr; } }
+
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .field label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-faint); }
+  .field input, .field select, .field textarea { font: inherit; font-size: 14px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-alt); color: var(--ink); }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 480px) { .field-row { grid-template-columns: 1fr; } }
+
+  .rec-box { border: 1px dashed var(--mint-ic); background: var(--mint-bg); border-radius: 12px; padding: 16px 18px; margin-top: 4px; display: none; }
+  .rec-box.show { display: block; }
+  .rec-box .rt { font-family: "IBM Plex Mono", monospace; font-size: 11.5px; color: var(--mint-ic); font-weight: 700; letter-spacing: .04em; }
+  .rec-box p { margin: 6px 0 0; font-size: 13.5px; color: var(--ink); }
+
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 11.5px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-faint); font-weight: 600; padding: 0 10px 10px; }
+  td { padding: 12px 10px; border-top: 1px solid var(--border); font-size: 13.5px; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  .chip { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; padding: 4px 9px; border-radius: 999px; }
+  .chip-listed { background: var(--blue-bg); color: var(--blue-ic); }
+  .chip-matching { background: var(--amber-bg); color: var(--amber-ic); }
+  .chip-offer { background: var(--mint-bg); color: var(--mint-ic); }
+  .chip-accepted { background: var(--green-bg); color: var(--green-deep); }
+  .chip-rejected { background: var(--red-bg); color: var(--red-ic); }
+  .empty-row { text-align: center; color: var(--ink-faint); font-size: 13.5px; padding: 30px 10px; }
+
+  .price-table td:nth-child(2), .price-table th:nth-child(2) { text-align: right; font-family: "IBM Plex Mono", monospace; }
+  .up { color: #16a34a; } .down { color: #dc2626; }
+
+  .offer-card { border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 10px; }
+  .offer-card:last-child { margin-bottom: 0; }
+  .offer-left b { display: block; font-size: 14px; }
+  .offer-left span { font-size: 12.5px; color: var(--ink-soft); }
+  .offer-price { font-family: "IBM Plex Mono", monospace; font-weight: 700; font-size: 16px; color: var(--green); }
+  .offer-actions { display: flex; gap: 8px; }
+
+  .advisor-log { display: flex; flex-direction: column; gap: 10px; max-height: 260px; overflow-y: auto; margin-bottom: 14px; }
+  .advisor-msg { font-size: 13.5px; padding: 10px 13px; border-radius: 10px; max-width: 90%; }
+  .advisor-msg.bot { background: var(--bg-alt); align-self: flex-start; }
+  .advisor-msg.user { background: var(--mint-bg); color: var(--mint-ic); align-self: flex-end; font-weight: 500; }
+  .advisor-input-row { display: flex; gap: 8px; }
+  .advisor-input-row input { flex: 1; }
+
+  /* ---------- auth gate ---------- */
+  .gate { max-width: 420px; margin: 80px auto; text-align: center; }
+  .gate .ic { width: 52px; height: 52px; border-radius: 14px; background: var(--mint-bg); color: var(--mint-ic); display: grid; place-items: center; margin: 0 auto 18px; }
+  .gate h2 { font-size: 22px; }
+  .gate p { color: var(--ink-soft); font-size: 14px; margin: 10px 0 24px; }
+  .role-pick-form { display: flex; gap: 8px; }
+  .role-pick-form label { flex: 1; text-align: center; border: 1px solid var(--border); border-radius: 8px; padding: 10px 6px; cursor: pointer; font-size: 13px; color: var(--ink); font-weight: 500; }
+  .role-pick-form input { position: absolute; opacity: 0; pointer-events: none; }
+  .role-pick-form label:has(input:checked) { background: var(--green); border-color: var(--green); color: #fff; }
+  .gate form { text-align: left; margin-top: 18px; }
+
+  /* ---------- toast ---------- */
+  .toast-stack { position: fixed; bottom: 20px; right: 20px; z-index: 100; display: flex; flex-direction: column; gap: 10px; max-width: min(340px, calc(100vw - 40px)); }
+  .toast { background: var(--ink); color: var(--bg); padding: 13px 16px; border-radius: 10px; font-size: 13.5px; display: flex; align-items: flex-start; gap: 10px; box-shadow: 0 10px 30px rgba(0,0,0,.25); animation: toast-in .22s ease; border-left: 3px solid var(--green); }
+  @keyframes toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .toast .tmark { color: var(--green); flex: none; }
+
+  /* ---------- mobile bottom nav ---------- */
+  .mobile-tabbar { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 1px solid var(--border); z-index: 40; }
+  @media (max-width: 900px) { .mobile-tabbar:not([hidden]) { display: flex; } .content { padding-bottom: 90px; } }
+  .mobile-tabbar button { flex: 1; background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 9px 4px; color: var(--ink-faint); font-size: 10.5px; cursor: pointer; }
+  .mobile-tabbar button.active { color: var(--mint-ic); }
+</style>
+</head>
+<body>
+
+<div class="toast-stack" id="toastStack" aria-live="polite"></div>
+
+<div id="gateWrap"></div>
+
+<div class="shell" id="appShell" hidden>
+  <aside class="sidebar">
+    <a href="index.html" class="brand-mini">
+      <span class="mark"><svg width="17" height="17" viewBox="0 0 30 30" fill="none"><path d="M15 22V13M15 13C15 9 11 7 8 7C8 12 10 15 15 13Z" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 13C15 9.5 18.5 7.5 22 8C22 12 19.5 14.5 15 13Z" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <span>AgriConnect</span>
+    </a>
+    <nav class="side-nav" id="sideNav">
+      <button type="button" class="side-link active" data-tab="overview"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg> Overview</button>
+      <button type="button" class="side-link" data-tab="produce"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22V11M12 11c0-4.5-4-7-8-7 0 5.5 3 8.5 8 7Z"/><path d="M12 11c0-4 4-6.5 8-6 0 4.5-3 7-8 6Z"/></svg> My Produce</button>
+      <button type="button" class="side-link" data-tab="prices"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/></svg> Market Prices</button>
+      <button type="button" class="side-link" data-tab="offers"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/></svg> Buyer Offers</button>
+      <button type="button" class="side-link" data-tab="advisor"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.6 4.7L18 9l-4.4 1.3L12 15l-1.6-4.7L6 9l4.4-1.3L12 3z"/></svg> AI Advisor</button>
+    </nav>
+    <div class="side-foot">
+      <a href="index.html" class="back-link">← Back to site</a>
+      <button type="button" class="side-link" id="signOutBtn" style="color:var(--red-ic);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg> Sign out</button>
+    </div>
+  </aside>
+
+  <div>
+    <header class="topbar">
+      <a href="index.html" class="icon-btn mobile-back" aria-label="Back to site">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+      </a>
+      <h1 id="topTitle">Overview</h1>
+      <label class="district-pick">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
+        <select id="districtSelect"><option>Yavatmal, Maharashtra</option><option>Nashik, Maharashtra</option><option>Indore, Madhya Pradesh</option><option>Kota, Rajasthan</option></select>
+      </label>
+      <button type="button" class="role-pill" id="rolePill"></button>
+    </header>
+
+    <main class="content">
+      <div class="greet">
+        <div>
+          <h2 id="greetName">Welcome back</h2>
+          <p>Here's what's happening with your produce today.</p>
+        </div>
+        <button type="button" class="btn btn-solid" id="quickAddBtn">+ Add Produce</button>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="ic" style="background:var(--blue-bg); color:var(--blue-ic);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22V11M12 11c0-4.5-4-7-8-7 0 5.5 3 8.5 8 7Z"/></svg></div>
+          <b class="mono" id="statLots">0</b><span>Active Lots</span>
+        </div>
+        <div class="stat-card">
+          <div class="ic" style="background:var(--amber-bg); color:var(--amber-ic);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/></svg></div>
+          <b class="mono" id="statOffers">3</b><span>Pending Offers</span>
+        </div>
+        <div class="stat-card">
+          <div class="ic" style="background:var(--mint-bg); color:var(--mint-ic);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg></div>
+          <b class="mono up">+1.8%</b><span>Avg Price Trend (7d)</span>
+        </div>
+        <div class="stat-card">
+          <div class="ic" style="background:var(--purple-bg); color:var(--purple-ic);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z"/></svg></div>
+          <b class="mono">₹0</b><span>Escrow This Month</span>
+        </div>
+      </div>
+
+      <!-- OVERVIEW / PRODUCE TAB -->
+      <section id="tab-overview" data-tabpanel>
+        <div class="two-col">
+          <div class="panel" id="addProduceCard">
+            <div class="panel-head">
+              <div><h3>Add Produce</h3><p class="sub">List a new lot to get matched with buyers.</p></div>
+            </div>
+            <form id="lotForm">
+              <div class="field-row">
+                <div class="field"><label for="lotCrop">Crop</label><select id="lotCrop" required>
+                  <option value="">Select crop</option><option>Wheat</option><option>Soybean</option><option>Cotton</option><option>Tur</option><option>Onion</option><option>Gram</option>
+                </select></div>
+                <div class="field"><label for="lotQty">Quantity (Q)</label><input id="lotQty" type="number" min="1" placeholder="e.g. 40" required></div>
+              </div>
+              <div class="field-row">
+                <div class="field"><label for="lotGrade">Quality grade</label><select id="lotGrade" required><option value="">Select grade</option><option>Grade A</option><option>Grade B</option><option>Grade C</option></select></div>
+                <div class="field"><label for="lotLoc">Location</label><input id="lotLoc" type="text" placeholder="e.g. Yavatmal" required></div>
+              </div>
+              <button type="submit" class="btn btn-solid" style="width:100%; justify-content:center;">Add lot &amp; get AI recommendation</button>
+            </form>
+            <div class="rec-box" id="recBox">
+              <span class="rt">AI RECOMMENDATION</span>
+              <p id="recText"></p>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><div><h3>Today's Best Markets</h3><p class="sub">Live mandi prices near you</p></div></div>
+            <table class="price-table" id="miniPriceTable"><thead><tr><th>Market</th><th>Price</th></tr></thead><tbody></tbody></table>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top:22px;">
+          <div class="panel-head"><div><h3>My Produce</h3><p class="sub">Lots you've listed on AgriConnect</p></div></div>
+          <table id="lotsTable"><thead><tr><th>Crop</th><th>Qty</th><th>Grade</th><th>Location</th><th>Status</th><th></th></tr></thead><tbody id="lotsTableBody"></tbody></table>
+        </div>
+      </section>
+
+      <!-- PRICES TAB -->
+      <section id="tab-prices" data-tabpanel hidden>
+        <div class="panel">
+          <div class="panel-head"><div><h3>Live Mandi Price Index</h3><p class="sub">Updates continuously across nearby markets</p></div></div>
+          <table class="price-table" id="fullPriceTable"><thead><tr><th>Market</th><th>Price</th></tr></thead><tbody></tbody></table>
+        </div>
+      </section>
+
+      <!-- OFFERS TAB -->
+      <section id="tab-offers" data-tabpanel hidden>
+        <div class="panel">
+          <div class="panel-head"><div><h3>Buyer Offers</h3><p class="sub">Compare and respond to offers on your listed lots</p></div></div>
+          <div id="offersList"></div>
+        </div>
+      </section>
+
+      <!-- ADVISOR TAB -->
+      <section id="tab-advisor" data-tabpanel hidden>
+        <div class="panel">
+          <div class="panel-head"><div><h3>AI Advisor</h3><p class="sub">Ask about pricing, timing, or buyer offers</p></div></div>
+          <div class="advisor-log" id="advisorLog"></div>
+          <div class="advisor-input-row">
+            <input type="text" id="advisorInput" placeholder="e.g. Should I sell my wheat now or wait?">
+            <button type="button" class="btn btn-solid" id="advisorSend">Ask</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<nav class="mobile-tabbar" id="mobileTabbar" hidden>
+  <button type="button" class="active" data-tab="overview"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Overview</button>
+  <button type="button" data-tab="prices"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg>Prices</button>
+  <button type="button" data-tab="offers"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/></svg>Offers</button>
+  <button type="button" data-tab="advisor"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.6 4.7L18 9l-4.4 1.3L12 15l-1.6-4.7L6 9l4.4-1.3L12 3z"/></svg>Advisor</button>
+</nav>
+
+<script>
+  function toast(msg) {
+    var stack = document.getElementById("toastStack");
+    var el = document.createElement("div");
+    el.className = "toast";
+    el.innerHTML = '<span class="tmark">●</span><span>' + msg + '</span>';
+    stack.appendChild(el);
+    setTimeout(function () {
+      el.style.transition = "opacity .25s ease";
+      el.style.opacity = "0";
+      setTimeout(function () { el.remove(); }, 260);
+    }, 4200);
+  }
+
+  var prices = [
+    ["Soybean · Ujjain", 4720, "up"], ["Cotton · Akola", 7280, "up"],
+    ["Tur · Latur", 10450, "flat"], ["Wheat · Indore", 2840, "up"],
+    ["Onion · Nashik", 1320, "down"], ["Gram · Jaipur", 5340, "up"],
+    ["Mustard · Kota", 5610, "down"], ["Maize · Sagar", 2110, "up"]
+  ];
+  function priceRows(list) {
+    return list.map(function (p) {
+      var arrow = p[2] === "up" ? '<span class="up">▲</span>' : p[2] === "down" ? '<span class="down">▼</span>' : "—";
+      return "<tr><td>" + p[0] + "</td><td>₹" + p[1].toLocaleString("en-IN") + "/Q " + arrow + "</td></tr>";
+    }).join("");
+  }
+  document.getElementById("miniPriceTable").querySelector("tbody").innerHTML = priceRows(prices.slice(0, 4));
+  document.getElementById("fullPriceTable").querySelector("tbody").innerHTML = priceRows(prices);
+
+  var mockOffers = [
+    { buyer: "Sunita Traders, Pune", crop: "Wheat lot #1", price: 2860, status: "pending" },
+    { buyer: "MSWC Warehouse, Nagpur", crop: "Soybean lot #2", price: 4790, status: "pending" },
+    { buyer: "AgroFresh Mills, Indore", crop: "Cotton lot #1", price: 7310, status: "pending" }
+  ];
+
+  /* ---------- state ---------- */
+  var state = {
+    user: JSON.parse(localStorage.getItem("ac_user") || "null"),
+    lots: JSON.parse(localStorage.getItem("ac_lots") || "[]")
+  };
+  function saveState() {
+    localStorage.setItem("ac_user", JSON.stringify(state.user));
+    localStorage.setItem("ac_lots", JSON.stringify(state.lots));
+  }
+
+  var gateWrap = document.getElementById("gateWrap");
+  var appShell = document.getElementById("appShell");
+  var mobileTabbar = document.getElementById("mobileTabbar");
+
+  function renderGate() {
+    gateWrap.hidden = false;
+    appShell.hidden = true;
+    mobileTabbar.hidden = true;
+    gateWrap.innerHTML =
+      '<div class="gate">' +
+        '<div class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>' +
+        '<h2>Sign in to your dashboard</h2>' +
+        '<p>Your farmer dashboard tracks produce lots, live buyer offers and AI sell recommendations — sign in to continue (mock login, no real credentials needed).</p>' +
+        '<form id="gateForm">' +
+          '<div class="field"><label>I am a</label><div class="role-pick-form">' +
+            '<label><input type="radio" name="role" value="Farmer" checked><span>Farmer</span></label>' +
+            '<label><input type="radio" name="role" value="Buyer"><span>Buyer</span></label>' +
+            '<label><input type="radio" name="role" value="Admin"><span>Admin</span></label>' +
+          '</div></div>' +
+          '<div class="field"><label for="gateName">Name</label><input id="gateName" type="text" placeholder="e.g. Ramesh Patil" required></div>' +
+          '<div class="field"><label for="gatePhone">Mobile number</label><input id="gatePhone" type="tel" placeholder="98xxxxxxxx" required></div>' +
+          '<button type="submit" class="btn btn-solid" style="width:100%; justify-content:center;">Sign in &amp; enter dashboard</button>' +
+        '</form>' +
+        '<p style="margin-top:16px;"><a href="index.html" class="back-link" style="justify-content:center; display:inline-flex;">← Back to site</a></p>' +
+      '</div>';
+
+    document.getElementById("gateForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var role = document.querySelector('input[name="role"]:checked').value;
+      var name = document.getElementById("gateName").value.trim();
+      state.user = { name: name, role: role };
+      saveState();
+      toast("Signed in as " + name + " (" + role + ").");
+      renderApp();
+    });
+  }
+
+  function renderApp() {
+    gateWrap.hidden = true;
+    gateWrap.innerHTML = "";
+    appShell.hidden = false;
+    mobileTabbar.hidden = false;
+
+    document.getElementById("greetName").textContent = "Welcome back, " + state.user.name.split(" ")[0] + " 👋";
+    var rolePill = document.getElementById("rolePill");
+    rolePill.textContent = state.user.name + " · " + state.user.role;
+
+    renderLots();
+    renderOffers();
+    renderAdvisorLog();
+  }
+
+  function renderLots() {
+    var tbody = document.getElementById("lotsTableBody");
+    document.getElementById("statLots").textContent = state.lots.length;
+    if (!state.lots.length) {
+      tbody.innerHTML = '<tr><td colspan="6" class="empty-row">No lots yet — add your first produce lot above.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = state.lots.map(function (lot, i) {
+      var chipClass = lot.status === "matching" ? "chip-matching" : lot.status === "offer" ? "chip-offer" : "chip-listed";
+      var chipText = lot.status === "matching" ? "Matching Buyers" : lot.status === "offer" ? "Offer Received" : "Listed";
+      return "<tr><td>" + lot.crop + "</td><td>" + lot.qty + "q</td><td>" + lot.grade + "</td><td>" + lot.loc + "</td>" +
+        '<td><span class="chip ' + chipClass + '">' + chipText + "</span></td>" +
+        '<td><button type="button" class="btn btn-line btn-sm" data-remove-lot="' + i + '">Remove</button></td></tr>';
+    }).join("");
+  }
+
+  function renderOffers() {
+    var wrap = document.getElementById("offersList");
+    wrap.innerHTML = mockOffers.map(function (o, i) {
+      if (o.status === "accepted") {
+        return '<div class="offer-card"><div class="offer-left"><b>' + o.crop + "</b><span>" + o.buyer + '</span></div><span class="chip chip-accepted">Accepted</span></div>';
+      }
+      if (o.status === "rejected") {
+        return '<div class="offer-card"><div class="offer-left"><b>' + o.crop + "</b><span>" + o.buyer + '</span></div><span class="chip chip-rejected">Rejected</span></div>';
+      }
+      return '<div class="offer-card"><div class="offer-left"><b>' + o.crop + "</b><span>" + o.buyer + '</span></div>' +
+        '<div class="offer-price">₹' + o.price.toLocaleString("en-IN") + "/Q</div>" +
+        '<div class="offer-actions"><button type="button" class="btn btn-line btn-sm" data-reject-offer="' + i + '">Decline</button><button type="button" class="btn btn-solid btn-sm" data-accept-offer="' + i + '">Accept</button></div></div>';
+    }).join("");
+    document.getElementById("statOffers").textContent = mockOffers.filter(function (o) { return o.status === "pending" || !o.status; }).length;
+  }
+
+  document.addEventListener("click", function (e) {
+    var rm = e.target.closest("[data-remove-lot]");
+    if (rm) {
+      var idx = +rm.getAttribute("data-remove-lot");
+      state.lots.splice(idx, 1);
+      saveState(); renderLots();
+      toast("Lot removed.");
+      return;
+    }
+    var acc = e.target.closest("[data-accept-offer]");
+    if (acc) {
+      mockOffers[+acc.getAttribute("data-accept-offer")].status = "accepted";
+      renderOffers();
+      toast("Offer accepted — a digital contract will be generated (demo).");
+      return;
+    }
+    var rej = e.target.closest("[data-reject-offer]");
+    if (rej) {
+      mockOffers[+rej.getAttribute("data-reject-offer")].status = "rejected";
+      renderOffers();
+      toast("Offer declined.");
+      return;
+    }
+  });
+
+  /* ---------- add produce form ---------- */
+  document.getElementById("lotForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var crop = document.getElementById("lotCrop").value;
+    var qty = document.getElementById("lotQty").value;
+    var grade = document.getElementById("lotGrade").value;
+    var loc = document.getElementById("lotLoc").value;
+    state.lots.push({ crop: crop, qty: qty, grade: grade, loc: loc, status: "matching" });
+    saveState(); renderLots();
+
+    var hold = Math.random() > 0.5;
+    var recBox = document.getElementById("recBox");
+    var recText = document.getElementById("recText");
+    recText.textContent = hold
+      ? "Hold for 3–4 days: " + crop + " prices are trending up (~+3–5%) in nearby mandis. Selling now would leave value on the table."
+      : "Sell now: " + crop + " prices are at a seasonal high in your district — waiting risks a pullback. Best matched buyer offers ₹" + (2400 + Math.floor(Math.random() * 3000)) + "/Q net.";
+    recBox.classList.add("show");
+    this.reset();
+    toast(crop + " · " + qty + "q listed. Matching verified buyers now.");
+  });
+
+  /* ---------- district ---------- */
+  document.getElementById("districtSelect").addEventListener("change", function (e) {
+    toast("Showing live mandi prices for " + e.target.value + ".");
+  });
+
+  /* ---------- sign out ---------- */
+  document.getElementById("signOutBtn").addEventListener("click", function () {
+    state.user = null;
+    saveState();
+    toast("Signed out.");
+    renderGate();
+  });
+
+  document.getElementById("quickAddBtn").addEventListener("click", function () {
+    setTab("overview");
+    document.getElementById("addProduceCard").scrollIntoView({ behavior: "smooth", block: "start" });
+    document.getElementById("lotCrop").focus();
+  });
+
+  /* ---------- tabs ---------- */
+  var tabTitles = { overview: "Overview", produce: "Overview", prices: "Market Prices", offers: "Buyer Offers", advisor: "AI Advisor" };
+  function setTab(tab) {
+    if (tab === "produce") tab = "overview";
+    document.querySelectorAll("[data-tabpanel]").forEach(function (p) { p.hidden = p.id !== "tab-" + tab; });
+    document.querySelectorAll(".side-link[data-tab]").forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-tab") === tab); });
+    document.querySelectorAll(".mobile-tabbar button[data-tab]").forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-tab") === tab); });
+    document.getElementById("topTitle").textContent = tabTitles[tab] || "Overview";
+  }
+  document.querySelectorAll(".side-link[data-tab], .mobile-tabbar button[data-tab]").forEach(function (b) {
+    b.addEventListener("click", function () { setTab(b.getAttribute("data-tab")); });
+  });
+
+  /* ---------- advisor ---------- */
+  var advisorMessages = [
+    { role: "bot", text: "Hi! I'm your AI Advisor. Ask me about mandi prices, the best time to sell, or a buyer's offer." }
+  ];
+  function renderAdvisorLog() {
+    var log = document.getElementById("advisorLog");
+    log.innerHTML = advisorMessages.map(function (m) {
+      return '<div class="advisor-msg ' + m.role + '">' + m.text + "</div>";
+    }).join("");
+    log.scrollTop = log.scrollHeight;
+  }
+  function advisorReply(q) {
+    var lower = q.toLowerCase();
+    if (lower.indexOf("wheat") !== -1) return "Wheat is up 1.8% this week in Indore mandi. Based on current arrivals, I'd hold 2–3 days for a likely further rise before selling.";
+    if (lower.indexOf("wait") !== -1 || lower.indexOf("now") !== -1) return "For most Grade A lots right now, holding 3–5 days shows a projected +3–5% net gain after storage cost — but if you need liquidity urgently, today's price is still fair.";
+    if (lower.indexOf("offer") !== -1 || lower.indexOf("buyer") !== -1) return "Compare the offer against the Net Realization Engine: subtract freight + mandi cess from the gross price. Anything within 2% of that number is a fair offer.";
+    return "Based on today's board, prices across your nearby mandis are broadly stable to slightly up. Add a produce lot above and I'll give a lot-specific recommendation.";
+  }
+  document.getElementById("advisorSend").addEventListener("click", sendAdvisorMsg);
+  document.getElementById("advisorInput").addEventListener("keydown", function (e) { if (e.key === "Enter") sendAdvisorMsg(); });
+  function sendAdvisorMsg() {
+    var input = document.getElementById("advisorInput");
+    var q = input.value.trim();
+    if (!q) return;
+    advisorMessages.push({ role: "user", text: q });
+    advisorMessages.push({ role: "bot", text: advisorReply(q) });
+    input.value = "";
+    renderAdvisorLog();
+  }
+
+  /* ---------- boot ---------- */
+  if (state.user) { renderApp(); } else { renderGate(); }
+</script>
+</body>
+</html>
