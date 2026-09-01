@@ -89,15 +89,20 @@
   .composer .send-btn:disabled { opacity: .5; cursor: not-allowed; }
   .composer .hint { font-size: 11.5px; color: var(--ink-faint); margin-top: 8px; text-align: center; }
 </style>
+<script src="i18n.js"></script>
 </head>
 <body>
 
 <header class="top">
   <a href="dashboard.html" class="brand">
     <span class="mark"><svg width="16" height="16" viewBox="0 0 30 30" fill="none"><path d="M15 22V13M15 13C15 9 11 7 8 7C8 12 10 15 15 13Z" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 13C15 9.5 18.5 7.5 22 8C22 12 19.5 14.5 15 13Z" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-    <span class="title-wrap"><h1>AI Advisor</h1><span class="subtitle">AgriConnect · price &amp; sell-timing assistant</span></span>
+    <span class="title-wrap"><h1 data-i18n="advisor_title">AI Advisor</h1><span class="subtitle" data-i18n="advisor_subtitle">AgriConnect · price &amp; sell-timing assistant</span></span>
   </a>
-  <a href="dashboard.html" class="back">← Back to Dashboard</a>
+  <label class="lang-pick" style="display:flex; align-items:center; gap:5px; border:1px solid var(--border); border-radius:8px; padding:7px 10px; font-size:13px; color:var(--ink-soft); background:var(--bg-alt); margin-left:auto;">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></svg>
+    <select id="langSelect" style="border:none; background:none; font:inherit; color:var(--ink); cursor:pointer;"></select>
+  </label>
+  <a href="dashboard.html" class="back" data-i18n="advisor_back">← Back to Dashboard</a>
 </header>
 
 <div class="chat-wrap" id="chatWrap">
@@ -105,19 +110,19 @@
 </div>
 
 <div class="suggestions" id="suggestions">
-  <button type="button" data-q="Should I sell my wheat now or wait?">Should I sell my wheat now or wait?</button>
-  <button type="button" data-q="How do I know if a buyer's offer is fair?">Is this buyer's offer fair?</button>
-  <button type="button" data-q="Which nearby mandi gives the best net price after transport?">Best mandi after transport cost?</button>
+  <button type="button" data-q="Should I sell my wheat now or wait?" data-i18n="advisor_suggestion_1">Should I sell my wheat now or wait?</button>
+  <button type="button" data-q="How do I know if a buyer's offer is fair?" data-i18n="advisor_suggestion_2">Is this buyer's offer fair?</button>
+  <button type="button" data-q="Which nearby mandi gives the best net price after transport?" data-i18n="advisor_suggestion_3">Best mandi after transport cost?</button>
 </div>
 
 <div class="composer">
   <div class="composer-inner">
-    <textarea id="chatInput" rows="1" placeholder="Ask about prices, timing, or an offer..."></textarea>
+    <textarea id="chatInput" rows="1" data-i18n-placeholder="advisor_placeholder" placeholder="Ask about prices, timing, or an offer..."></textarea>
     <button type="button" class="send-btn" id="sendBtn" aria-label="Send">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
     </button>
   </div>
-  <p class="hint">AI-generated — always confirm big decisions with your local mandi before selling.</p>
+  <p class="hint" data-i18n="advisor_hint">AI-generated — always confirm big decisions with your local mandi before selling.</p>
 </div>
 
 <script>
@@ -128,7 +133,7 @@
   var suggestions = document.getElementById("suggestions");
 
   var chatHistory = [
-    { role: "assistant", content: "Namaste! I'm your AI Advisor. Ask me anything about mandi prices, when to sell, or whether a buyer's offer is fair." }
+    { role: "assistant", content: window.AgriI18n.t("advisor_greeting") }
   ];
 
   function scrollToBottom() {
@@ -212,6 +217,15 @@
   });
   suggestions.querySelectorAll("[data-q]").forEach(function (btn) {
     btn.addEventListener("click", function () { sendMessage(btn.getAttribute("data-q")); });
+  });
+
+  document.addEventListener("agri:langchange", function () {
+    if (chatHistory.length === 1 && chatHistory[0].role === "assistant") {
+      var text = window.AgriI18n.t("advisor_greeting");
+      chatHistory[0].content = text;
+      var firstBubble = chatInner.querySelector(".msg .bubble");
+      if (firstBubble) firstBubble.textContent = text;
+    }
   });
 </script>
 </body>
