@@ -153,6 +153,7 @@
   .chip-listed { background: var(--blue-bg); color: var(--blue-ic); }
   .chip-matching { background: var(--amber-bg); color: var(--amber-ic); }
   .chip-offer { background: var(--mint-bg); color: var(--mint-ic); }
+  .chip-shipped { background: var(--purple-bg); color: var(--purple-ic); }
   .chip-accepted { background: var(--green-bg); color: var(--green-deep); }
   .chip-rejected { background: var(--red-bg); color: var(--red-ic); }
   .empty-row { text-align: center; color: var(--ink-faint); font-size: 13.5px; padding: 30px 10px; }
@@ -489,8 +490,9 @@
       return;
     }
     tbody.innerHTML = state.lots.map(function (lot) {
-      var chipClass = lot.status === "matching" ? "chip-matching" : lot.status === "offer" ? "chip-offer" : "chip-listed";
-      var chipText = lot.status === "matching" ? "Matching Buyers" : lot.status === "offer" ? "Offer Received" : "Listed";
+      var chipMap = { matching: ["chip-matching", "Matching Buyers"], offer: ["chip-offer", "Offer Received"], shipped: ["chip-shipped", "In Transit"] };
+      var chipInfo = chipMap[lot.status] || ["chip-listed", "Listed"];
+      var chipClass = chipInfo[0], chipText = chipInfo[1];
       return "<tr><td>" + lot.crop + "</td><td>" + lot.qty + "q</td><td>" + lot.grade + "</td><td>" + lot.location + "</td>" +
         '<td><span class="chip ' + chipClass + '">' + chipText + "</span></td>" +
         '<td><button type="button" class="btn btn-line btn-sm" data-remove-lot="' + lot.id + '">Remove</button></td></tr>';
@@ -514,7 +516,9 @@
     wrap.innerHTML = state.offers.map(function (o) {
       var crop = o.lots ? o.lots.crop : "Lot";
       if (o.status === "accepted") {
-        return '<div class="offer-card"><div class="offer-left"><b>' + crop + "</b><span>" + o.buyer_name + '</span></div><span class="chip chip-accepted">Accepted</span></div>';
+        return '<div class="offer-card"><div class="offer-left"><b>' + crop + "</b><span>" + o.buyer_name + '</span></div>' +
+          '<span class="chip chip-accepted">Accepted</span>' +
+          '<a href="transport.html?offer=' + o.id + '" class="btn btn-solid btn-sm">Arrange Transport →</a></div>';
       }
       if (o.status === "rejected") {
         return '<div class="offer-card"><div class="offer-left"><b>' + crop + "</b><span>" + o.buyer_name + '</span></div><span class="chip chip-rejected">Rejected</span></div>';

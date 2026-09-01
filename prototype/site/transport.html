@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arrange Transport — AgriConnect</title>
+<meta name="description" content="AgriConnect Transport & Logistics — book pickup for an accepted deal through a trusted courier partner.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+  :root {
+    --bg: #f6f7f9; --bg-alt: #eef1f4; --card: #ffffff; --border: #e3e7ec;
+    --ink: #12181f; --ink-soft: #5b6472; --ink-faint: #8b93a1;
+    --green: #16a34a; --green-deep: #14532d; --green-bg: #e8f8ee;
+    --mint-bg: #e8f8ee; --mint-ic: #0f9d58;
+    --purple-bg: #f2edff; --purple-ic: #7c3aed;
+    --red-bg: #fdecec; --red-ic: #c0392b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0c0f14; --bg-alt: #11151c; --card: #151a22; --border: #262c37;
+      --ink: #eef1f5; --ink-soft: #a2acb9; --ink-faint: #6b7482;
+      --mint-bg: #103524; --mint-ic: #34d399; --purple-bg: #241a3f; --purple-ic: #a78bfa;
+      --red-bg: #341313; --red-ic: #f27272;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0c0f14; --bg-alt: #11151c; --card: #151a22; --border: #262c37;
+    --ink: #eef1f5; --ink-soft: #a2acb9; --ink-faint: #6b7482;
+    --mint-bg: #103524; --mint-ic: #34d399; --purple-bg: #241a3f; --purple-ic: #a78bfa;
+    --red-bg: #341313; --red-ic: #f27272;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { overflow-x: hidden; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: "IBM Plex Sans", system-ui, sans-serif; font-size: 15.5px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  h1, h2, h3 { font-family: "IBM Plex Sans", system-ui, sans-serif; margin: 0; color: var(--ink); font-weight: 700; letter-spacing: -0.01em; text-wrap: balance; }
+  .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+  a { color: inherit; }
+  button { font: inherit; }
+  *:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+
+  header.top { position: sticky; top: 0; z-index: 20; background: var(--card); border-bottom: 1px solid var(--border); padding: 14px 22px; display: flex; align-items: center; gap: 12px; }
+  header.top .brand { display: flex; align-items: center; gap: 9px; font-weight: 700; text-decoration: none; }
+  header.top .mark { width: 30px; height: 30px; border-radius: 8px; background: var(--green); display: grid; place-items: center; flex: none; }
+  header.top .step { margin-left: auto; font-size: 12.5px; color: var(--ink-faint); font-family: "IBM Plex Mono", monospace; }
+
+  .wrap { max-width: 780px; margin: 0 auto; padding: 32px 22px 80px; }
+
+  .badge-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-family: "IBM Plex Mono", monospace; font-size: 11.5px; letter-spacing: .05em; padding: 6px 13px; border-radius: 999px; background: var(--mint-bg); color: var(--mint-ic); font-weight: 600; }
+
+  .deal-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 22px; margin: 18px 0 28px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; }
+  .deal-card .dl b { display: block; font-size: 18px; }
+  .deal-card .dl span { font-size: 13px; color: var(--ink-soft); }
+  .deal-card .dp { font-family: "IBM Plex Mono", monospace; font-weight: 700; font-size: 20px; color: var(--green); }
+
+  .carrier-grid { display: flex; flex-direction: column; gap: 12px; }
+  .carrier-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px;
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+  .carrier-logo {
+    width: 52px; height: 52px; border-radius: 12px; flex: none; display: grid; place-items: center;
+    font-weight: 800; font-size: 12px; color: #fff; text-align: center; letter-spacing: -0.02em;
+  }
+  .carrier-info { flex: 1; min-width: 180px; }
+  .carrier-info b { display: block; font-size: 15.5px; }
+  .carrier-info span { font-size: 12.5px; color: var(--ink-soft); }
+  .carrier-meta { display: flex; gap: 18px; font-size: 13px; color: var(--ink-soft); }
+  .carrier-meta b { color: var(--ink); font-family: "IBM Plex Mono", monospace; font-weight: 600; }
+  .carrier-stars { color: #f59e0b; font-size: 12.5px; }
+
+  .btn { font-weight: 600; font-size: 14px; padding: 10px 18px; border-radius: 10px; cursor: pointer; border: 1px solid transparent; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+  .btn-solid { background: var(--green); color: #fff; }
+  .btn-solid:hover { background: var(--green-deep); }
+  .btn-line { border-color: var(--border); color: var(--ink); background: var(--card); }
+  .btn-line:hover { border-color: var(--ink-faint); }
+
+  .center-note { text-align: center; color: var(--ink-soft); padding: 60px 20px; }
+  .center-note.error { color: var(--red-ic); }
+
+  /* confirmation */
+  .confirm-wrap { text-align: center; padding: 20px 0; }
+  .confirm-icon { width: 64px; height: 64px; border-radius: 50%; background: var(--mint-bg); color: var(--mint-ic); display: grid; place-items: center; margin: 0 auto 20px; }
+  .tracking-id { font-family: "IBM Plex Mono", monospace; font-size: 20px; font-weight: 700; background: var(--bg-alt); border: 1px dashed var(--ink-faint); border-radius: 10px; padding: 12px 18px; display: inline-block; margin: 16px 0; }
+  .progress-track { display: flex; justify-content: space-between; max-width: 460px; margin: 34px auto; position: relative; }
+  .progress-track::before { content: ""; position: absolute; top: 13px; left: 20px; right: 20px; height: 2px; background: var(--border); z-index: 0; }
+  .progress-track .step-dot { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .progress-track .dot { width: 26px; height: 26px; border-radius: 50%; background: var(--card); border: 2px solid var(--border); display: grid; place-items: center; }
+  .progress-track .step-dot.done .dot { background: var(--green); border-color: var(--green); color: #fff; }
+  .progress-track .step-dot span { font-size: 11.5px; color: var(--ink-soft); }
+
+  @media (max-width: 560px) {
+    .deal-card { flex-direction: column; align-items: flex-start; }
+    .carrier-card { flex-direction: column; align-items: flex-start; }
+    .carrier-meta { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <a href="dashboard.html" class="brand">
+    <span class="mark"><svg width="16" height="16" viewBox="0 0 30 30" fill="none"><path d="M15 22V13M15 13C15 9 11 7 8 7C8 12 10 15 15 13Z" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 13C15 9.5 18.5 7.5 22 8C22 12 19.5 14.5 15 13Z" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    AgriConnect
+  </a>
+  <span class="step">Deal Accepted → Transport & Logistics</span>
+</header>
+
+<div class="wrap" id="content">
+  <div class="center-note">Loading your deal...</div>
+</div>
+
+<script>
+  var SUPABASE_URL = "https://zuacwddjassysntscpzy.supabase.co";
+  var SUPABASE_KEY = "sb_publishable_De6ugFUdJldaYu5qssrb6w_aIN2iVUT";
+  var sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+  var CARRIERS = [
+    { name: "Amazon Shipping", tag: "AMZN", bg: "linear-gradient(135deg,#232f3e,#131a22)", eta: "1–2 days", cost: 180, rating: "4.6" },
+    { name: "Ekart Logistics", tag: "Flipkart", bg: "linear-gradient(135deg,#2874f0,#1a53b8)", eta: "2 days", cost: 150, rating: "4.4" },
+    { name: "Delhivery", tag: "DLH", bg: "linear-gradient(135deg,#e84c3d,#b8362a)", eta: "1–3 days", cost: 165, rating: "4.5" },
+    { name: "Blue Dart", tag: "BD", bg: "linear-gradient(135deg,#0a2f6b,#071d45)", eta: "1 day", cost: 240, rating: "4.7" },
+    { name: "DTDC", tag: "DTDC", bg: "linear-gradient(135deg,#f4a300,#c98200)", eta: "2–3 days", cost: 120, rating: "4.2" }
+  ];
+
+  var content = document.getElementById("content");
+  var params = new URLSearchParams(location.search);
+  var offerId = params.get("offer");
+
+  function toast(msg) {
+    var el = document.createElement("div");
+    el.style.cssText = "position:fixed;bottom:20px;right:20px;background:var(--ink);color:var(--bg);padding:13px 16px;border-radius:10px;font-size:13.5px;z-index:100;box-shadow:0 10px 30px rgba(0,0,0,.25);border-left:3px solid var(--green);";
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(function () { el.remove(); }, 4000);
+  }
+
+  function renderError(msg) {
+    content.innerHTML = '<div class="center-note error">' + msg + '<br><br><a href="dashboard.html" class="btn btn-line">← Back to dashboard</a></div>';
+  }
+
+  function renderCarriers(deal) {
+    content.innerHTML =
+      '<span class="badge-eyebrow">Step 7 · Logistics</span>' +
+      '<h1 style="margin-top:14px; font-size:26px;">Arrange transport for your deal</h1>' +
+      '<p style="color:var(--ink-soft); margin-top:8px;">Compare trusted courier &amp; logistics partners and book pickup — shown for demo purposes.</p>' +
+      '<div class="deal-card">' +
+        '<div class="dl"><b>' + deal.crop + ' · ' + deal.qty + 'q (' + deal.grade + ')</b><span>Buyer: ' + deal.buyer_name + ' · From ' + deal.location + '</span></div>' +
+        '<div class="dp">₹' + Number(deal.price).toLocaleString("en-IN") + '/Q</div>' +
+      '</div>' +
+      '<div class="carrier-grid">' +
+      CARRIERS.map(function (c, i) {
+        return '<div class="carrier-card">' +
+          '<div class="carrier-logo" style="background:' + c.bg + '">' + c.tag + '</div>' +
+          '<div class="carrier-info"><b>' + c.name + '</b><span class="carrier-stars">★ ' + c.rating + ' rating</span></div>' +
+          '<div class="carrier-meta"><div>ETA<br><b>' + c.eta + '</b></div><div>Est. Cost<br><b>₹' + c.cost + '</b></div></div>' +
+          '<button type="button" class="btn btn-solid" data-book="' + i + '">Book Pickup</button>' +
+        '</div>';
+      }).join("") +
+      '</div>' +
+      '<p style="text-align:center; margin-top:24px;"><a href="dashboard.html" class="btn btn-line">← Back to dashboard</a></p>';
+
+    content.querySelectorAll("[data-book]").forEach(function (btn) {
+      btn.addEventListener("click", function () { bookCarrier(deal, CARRIERS[+btn.getAttribute("data-book")]); });
+    });
+  }
+
+  async function bookCarrier(deal, carrier) {
+    var trackingId = carrier.tag.replace(/\s/g, "").toUpperCase() + "-" + Math.floor(100000 + Math.random() * 899999);
+    if (sb && deal.lot_id) {
+      await sb.from("lots").update({ status: "shipped" }).eq("id", deal.lot_id);
+    }
+    renderConfirmation(deal, carrier, trackingId);
+  }
+
+  function renderConfirmation(deal, carrier, trackingId) {
+    content.innerHTML =
+      '<div class="confirm-wrap">' +
+        '<div class="confirm-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></div>' +
+        '<h1 style="font-size:24px;">Pickup booked with ' + carrier.name + '</h1>' +
+        '<p style="color:var(--ink-soft); margin-top:8px;">' + deal.crop + ' · ' + deal.qty + 'q for ' + deal.buyer_name + '</p>' +
+        '<div class="tracking-id">' + trackingId + '</div>' +
+        '<div class="progress-track">' +
+          '<div class="step-dot done"><div class="dot">✓</div><span>Booked</span></div>' +
+          '<div class="step-dot"><div class="dot">2</div><span>Picked Up</span></div>' +
+          '<div class="step-dot"><div class="dot">3</div><span>In Transit</span></div>' +
+          '<div class="step-dot"><div class="dot">4</div><span>Delivered</span></div>' +
+        '</div>' +
+        '<p style="color:var(--ink-soft); font-size:13px;">Estimated delivery: ' + carrier.eta + ' · Demo tracking, not a real shipment.</p>' +
+        '<a href="dashboard.html" class="btn btn-solid" style="margin-top:10px;">Back to Dashboard</a>' +
+      '</div>';
+  }
+
+  (async function boot() {
+    if (!offerId) { renderError("No deal specified. Accept an offer from your dashboard first."); return; }
+    if (!sb) { renderError("Backend unavailable — refresh and try again."); return; }
+    try {
+      var { data: { session } } = await sb.auth.getSession();
+      if (!session) { renderError('Please <a href="dashboard.html">sign in</a> first.'); return; }
+      var { data: offer, error } = await sb.from("offers").select("*, lots(crop, qty, grade, location, id)").eq("id", offerId).maybeSingle();
+      if (error || !offer) { renderError("Could not find this deal."); return; }
+      renderCarriers({
+        crop: offer.lots.crop, qty: offer.lots.qty, grade: offer.lots.grade, location: offer.lots.location,
+        lot_id: offer.lots.id, buyer_name: offer.buyer_name, price: offer.price
+      });
+    } catch (err) {
+      renderError("Could not reach the backend: " + err.message);
+    }
+  })();
+</script>
+</body>
+</html>
