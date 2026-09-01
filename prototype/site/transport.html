@@ -10,6 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="i18n.js"></script>
+<script src="theme.js"></script>
 <style>
   :root {
     --bg: #f6f7f9; --bg-alt: #eef1f4; --card: #ffffff; --border: #e3e7ec;
@@ -112,6 +113,7 @@
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></svg>
     <select id="langSelect" style="border:none; background:none; font:inherit; color:var(--ink); cursor:pointer;"></select>
   </label>
+  <button type="button" data-theme-toggle aria-label="Toggle theme" style="display:grid; place-items:center; width:34px; height:34px; border-radius:8px; border:1px solid var(--border); background:var(--card); color:var(--ink-soft); cursor:pointer; flex:none;"></button>
 </header>
 
 <div class="wrap" id="content">
