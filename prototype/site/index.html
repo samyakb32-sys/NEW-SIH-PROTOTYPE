@@ -788,18 +788,29 @@
     return html;
   }
 
+  var signinMode = "signup"; // "signup" | "signin"
+
   function renderSignin() {
+    var isSignup = signinMode === "signup";
     return '<span class="badge-eyebrow">Account</span>'
-      + '<h3 id="modalTitle">Sign in</h3>'
-      + '<p class="modal-sub">No email or password needed for this demo — a real account is created for you behind the scenes.</p>'
+      + '<h3 id="modalTitle">' + (isSignup ? "Create your account" : "Sign in") + '</h3>'
+      + '<p class="modal-sub">Real accounts, backed by a database.</p>'
+      + '<div style="display:flex; gap:8px; margin-bottom:16px;">'
+      + '<button type="button" class="btn ' + (isSignup ? "btn-solid" : "btn-line") + '" style="flex:1; justify-content:center;" data-signin-mode="signup">Create account</button>'
+      + '<button type="button" class="btn ' + (!isSignup ? "btn-solid" : "btn-line") + '" style="flex:1; justify-content:center;" data-signin-mode="signin">Sign in</button>'
+      + '</div>'
       + '<form id="signinForm">'
-      + '<div class="field"><label>I am a</label><div class="role-pick-form">'
-      + '<label><input type="radio" name="role" value="Farmer" checked><span>Farmer</span></label>'
-      + '<label><input type="radio" name="role" value="Buyer"><span>Buyer</span></label>'
-      + '<label><input type="radio" name="role" value="Admin"><span>Admin</span></label>'
-      + '</div></div>'
-      + '<div class="field"><label for="signinName">Name</label><input id="signinName" type="text" placeholder="e.g. Ramesh Patil" required></div>'
-      + '<button type="submit" class="btn btn-solid btn-lg">Sign in</button>'
+      + (isSignup
+          ? '<div class="field"><label>I am a</label><div class="role-pick-form">'
+            + '<label><input type="radio" name="role" value="Farmer" checked><span>Farmer</span></label>'
+            + '<label><input type="radio" name="role" value="Buyer"><span>Buyer</span></label>'
+            + '<label><input type="radio" name="role" value="Admin"><span>Admin</span></label>'
+            + '</div></div>'
+            + '<div class="field"><label for="signinName">Name</label><input id="signinName" type="text" placeholder="e.g. Ramesh Patil" required></div>'
+          : '')
+      + '<div class="field"><label for="signinEmail">Email</label><input id="signinEmail" type="email" placeholder="you@example.com" required></div>'
+      + '<div class="field"><label for="signinPassword">Password</label><input id="signinPassword" type="password" placeholder="At least 6 characters" minlength="6" required></div>'
+      + '<button type="submit" class="btn btn-solid btn-lg">' + (isSignup ? "Create account" : "Sign in") + '</button>'
       + '</form>';
   }
 
@@ -834,6 +845,10 @@
     closeDrawer();
     notifPop.classList.remove("open");
 
+    modalContent.querySelectorAll("[data-signin-mode]").forEach(function (btn) {
+      btn.addEventListener("click", function () { signinMode = btn.getAttribute("data-signin-mode"); openModal("signin"); });
+    });
+
     var firstField = modalContent.querySelector("input, select, textarea, button");
     if (firstField) firstField.focus();
 
@@ -856,25 +871,51 @@
       if (!sb) { toast("Backend unavailable — refresh and try again."); return; }
       var submitBtn = e.target.querySelector("button[type=submit]");
       submitBtn.disabled = true;
-      submitBtn.textContent = "Signing in...";
-      var role = modalContent.querySelector('input[name="role"]:checked').value;
-      var name = document.getElementById("signinName").value.trim();
+      var email = document.getElementById("signinEmail").value.trim();
+      var password = document.getElementById("signinPassword").value;
 
-      var { data: authData, error: authError } = await sb.auth.signInAnonymously();
-      if (authError) {
-        submitBtn.disabled = false; submitBtn.textContent = "Sign in";
-        toast("Sign-in failed: " + authError.message);
-        return;
+      if (signinMode === "signup") {
+        submitBtn.textContent = "Creating account...";
+        var role = modalContent.querySelector('input[name="role"]:checked').value;
+        var name = document.getElementById("signinName").value.trim();
+        var { data: authData, error: authError } = await sb.auth.signUp({ email: email, password: password });
+        if (authError) {
+          submitBtn.disabled = false; submitBtn.textContent = "Create account";
+          toast("Could not create account: " + authError.message);
+          return;
+        }
+        if (!authData.session) {
+          submitBtn.disabled = false; submitBtn.textContent = "Create account";
+          toast("Account created — check your email to confirm, then sign in.");
+          return;
+        }
+        var { error: profileError } = await sb.from("profiles").upsert({ id: authData.user.id, name: name, role: role });
+        if (profileError) {
+          submitBtn.disabled = false; submitBtn.textContent = "Create account";
+          toast("Could not save profile: " + profileError.message);
+          return;
+        }
+        state.user = { id: authData.user.id, name: name, role: role };
+        refreshUI(); closeModal();
+        toast("Account created — welcome, " + name + "!");
+      } else {
+        submitBtn.textContent = "Signing in...";
+        var { data: signinData, error: signinError } = await sb.auth.signInWithPassword({ email: email, password: password });
+        if (signinError) {
+          submitBtn.disabled = false; submitBtn.textContent = "Sign in";
+          toast("Sign-in failed: " + signinError.message);
+          return;
+        }
+        var { data: profile } = await sb.from("profiles").select("*").eq("id", signinData.user.id).maybeSingle();
+        if (!profile) {
+          submitBtn.disabled = false; submitBtn.textContent = "Sign in";
+          toast("No profile found for this account.");
+          return;
+        }
+        state.user = profile;
+        refreshUI(); closeModal();
+        toast("Signed in as " + profile.name + " (" + profile.role + ").");
       }
-      var { error: profileError } = await sb.from("profiles").upsert({ id: authData.user.id, name: name, role: role });
-      if (profileError) {
-        submitBtn.disabled = false; submitBtn.textContent = "Sign in";
-        toast("Could not save profile: " + profileError.message);
-        return;
-      }
-      state.user = { id: authData.user.id, name: name, role: role };
-      refreshUI(); closeModal();
-      toast("Signed in as " + name + " (" + role + ").");
     } else if (formId === "contactForm") {
       var nm = document.getElementById("cName").value.trim();
       closeModal();

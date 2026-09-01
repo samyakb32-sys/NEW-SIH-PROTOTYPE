@@ -382,28 +382,42 @@
   var appShell = document.getElementById("appShell");
   var mobileTabbar = document.getElementById("mobileTabbar");
 
+  var gateMode = "signup"; // "signup" | "signin"
+
   function renderGate(errorMsg) {
     gateWrap.hidden = false;
     appShell.hidden = true;
     mobileTabbar.hidden = true;
+    var isSignup = gateMode === "signup";
     gateWrap.innerHTML =
       '<div class="gate">' +
         '<div class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>' +
-        '<h2>Sign in to your dashboard</h2>' +
-        '<p>Your farmer dashboard tracks produce lots, live buyer offers and AI sell recommendations, backed by a real database — sign in to continue (no email/password needed for this demo).</p>' +
-        (errorMsg ? '<p style="color:var(--red-ic); font-size:13px;">' + errorMsg + '</p>' : '') +
-        '<form id="gateForm">' +
-          '<div class="field"><label>I am a</label><div class="role-pick-form">' +
-            '<label><input type="radio" name="role" value="Farmer" checked><span>Farmer</span></label>' +
-            '<label><input type="radio" name="role" value="Buyer"><span>Buyer</span></label>' +
-            '<label><input type="radio" name="role" value="Admin"><span>Admin</span></label>' +
-          '</div></div>' +
-          '<div class="field"><label for="gateName">Name</label><input id="gateName" type="text" placeholder="e.g. Ramesh Patil" required></div>' +
-          '<button type="submit" class="btn btn-solid" style="width:100%; justify-content:center;">Sign in &amp; enter dashboard</button>' +
+        '<h2>' + (isSignup ? "Create your account" : "Sign in to your dashboard") + '</h2>' +
+        '<p>Your farmer dashboard tracks produce lots, live buyer offers and AI sell recommendations, backed by a real database.</p>' +
+        '<div class="gate-tabs" style="display:flex; gap:8px; margin-top:18px;">' +
+          '<button type="button" class="btn ' + (isSignup ? "btn-solid" : "btn-line") + '" style="flex:1; justify-content:center;" data-gate-mode="signup">Create account</button>' +
+          '<button type="button" class="btn ' + (!isSignup ? "btn-solid" : "btn-line") + '" style="flex:1; justify-content:center;" data-gate-mode="signin">Sign in</button>' +
+        '</div>' +
+        (errorMsg ? '<p style="color:var(--red-ic); font-size:13px; margin-top:14px;">' + errorMsg + '</p>' : '') +
+        '<form id="gateForm" style="margin-top:18px;">' +
+          (isSignup
+            ? '<div class="field"><label>I am a</label><div class="role-pick-form">' +
+                '<label><input type="radio" name="role" value="Farmer" checked><span>Farmer</span></label>' +
+                '<label><input type="radio" name="role" value="Buyer"><span>Buyer</span></label>' +
+                '<label><input type="radio" name="role" value="Admin"><span>Admin</span></label>' +
+              '</div></div>' +
+              '<div class="field"><label for="gateName">Name</label><input id="gateName" type="text" placeholder="e.g. Ramesh Patil" required></div>'
+            : '') +
+          '<div class="field"><label for="gateEmail">Email</label><input id="gateEmail" type="email" placeholder="you@example.com" required></div>' +
+          '<div class="field"><label for="gatePassword">Password</label><input id="gatePassword" type="password" placeholder="At least 6 characters" minlength="6" required></div>' +
+          '<button type="submit" class="btn btn-solid" style="width:100%; justify-content:center;">' + (isSignup ? "Create account & enter dashboard" : "Sign in") + '</button>' +
         '</form>' +
         '<p style="margin-top:16px;"><a href="index.html" class="back-link" style="justify-content:center; display:inline-flex;">← Back to site</a></p>' +
       '</div>';
 
+    gateWrap.querySelectorAll("[data-gate-mode]").forEach(function (btn) {
+      btn.addEventListener("click", function () { gateMode = btn.getAttribute("data-gate-mode"); renderGate(); });
+    });
     document.getElementById("gateForm").addEventListener("submit", handleGateSubmit);
   }
 
@@ -412,31 +426,34 @@
     if (!sb) { renderGate("Backend unavailable — refresh and try again."); return; }
     var submitBtn = e.target.querySelector("button[type=submit]");
     submitBtn.disabled = true;
-    submitBtn.textContent = "Signing in...";
-    var role = document.querySelector('input[name="role"]:checked').value;
-    var name = document.getElementById("gateName").value.trim();
+    submitBtn.textContent = gateMode === "signup" ? "Creating account..." : "Signing in...";
+    var email = document.getElementById("gateEmail").value.trim();
+    var password = document.getElementById("gatePassword").value;
 
-    var { data: authData, error: authError } = await sb.auth.signInAnonymously();
-    if (authError) {
-      renderGate("Sign-in failed: " + authError.message + " — make sure Anonymous Sign-Ins is enabled in Supabase (Authentication → Sign In / Providers).");
-      return;
+    if (gateMode === "signup") {
+      var role = document.querySelector('input[name="role"]:checked').value;
+      var name = document.getElementById("gateName").value.trim();
+      var { data: authData, error: authError } = await sb.auth.signUp({ email: email, password: password });
+      if (authError) { renderGate("Could not create account: " + authError.message); return; }
+      if (!authData.session) { renderGate("Account created — check your email to confirm, then sign in."); return; }
+      var { error: profileError } = await sb.from("profiles").upsert({ id: authData.user.id, name: name, role: role });
+      if (profileError) { renderGate("Could not save your profile: " + profileError.message); return; }
+      state.user = { id: authData.user.id, name: name, role: role };
+      toast("Account created — welcome, " + name + "!");
+      await renderApp();
+    } else {
+      var { data: signinData, error: signinError } = await sb.auth.signInWithPassword({ email: email, password: password });
+      if (signinError) { renderGate("Sign-in failed: " + signinError.message); return; }
+      await loadProfileAndApp(signinData.user.id);
     }
-    var uid = authData.user.id;
-    var { error: profileError } = await sb.from("profiles").upsert({ id: uid, name: name, role: role });
-    if (profileError) {
-      renderGate("Could not save your profile: " + profileError.message + " — check the schema was created (see supabase_schema.sql).");
-      return;
-    }
-    state.user = { id: uid, name: name, role: role };
-    toast("Signed in as " + name + " (" + role + ").");
-    await renderApp();
   }
 
   async function loadProfileAndApp(uid) {
     var { data: profile, error } = await sb.from("profiles").select("*").eq("id", uid).maybeSingle();
     if (error || !profile) {
       await sb.auth.signOut();
-      renderGate();
+      gateMode = "signup";
+      renderGate(error ? "Could not load your profile: " + error.message : "No profile found for this account — create one below.");
       return;
     }
     state.user = profile;
