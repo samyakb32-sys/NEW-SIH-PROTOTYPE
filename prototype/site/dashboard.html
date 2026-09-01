@@ -168,12 +168,6 @@
   .offer-price { font-family: "IBM Plex Mono", monospace; font-weight: 700; font-size: 16px; color: var(--green); }
   .offer-actions { display: flex; gap: 8px; }
 
-  .advisor-log { display: flex; flex-direction: column; gap: 10px; max-height: 260px; overflow-y: auto; margin-bottom: 14px; }
-  .advisor-msg { font-size: 13.5px; padding: 10px 13px; border-radius: 10px; max-width: 90%; }
-  .advisor-msg.bot { background: var(--bg-alt); align-self: flex-start; }
-  .advisor-msg.user { background: var(--mint-bg); color: var(--mint-ic); align-self: flex-end; font-weight: 500; }
-  .advisor-input-row { display: flex; gap: 8px; }
-  .advisor-input-row input { flex: 1; }
 
   /* ---------- auth gate ---------- */
   .gate { max-width: 420px; margin: 80px auto; text-align: center; }
@@ -195,7 +189,7 @@
   /* ---------- mobile bottom nav ---------- */
   .mobile-tabbar { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 1px solid var(--border); z-index: 40; }
   @media (max-width: 900px) { .mobile-tabbar:not([hidden]) { display: flex; } .content { padding-bottom: 90px; } }
-  .mobile-tabbar button { flex: 1; background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 9px 4px; color: var(--ink-faint); font-size: 10.5px; cursor: pointer; }
+  .mobile-tabbar button, .mobile-tabbar a { flex: 1; background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 9px 4px; color: var(--ink-faint); font-size: 10.5px; cursor: pointer; text-decoration: none; }
   .mobile-tabbar button.active { color: var(--mint-ic); }
 </style>
 </head>
@@ -216,7 +210,7 @@
       <button type="button" class="side-link" data-tab="produce"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22V11M12 11c0-4.5-4-7-8-7 0 5.5 3 8.5 8 7Z"/><path d="M12 11c0-4 4-6.5 8-6 0 4.5-3 7-8 6Z"/></svg> My Produce</button>
       <button type="button" class="side-link" data-tab="prices"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/></svg> Market Prices</button>
       <button type="button" class="side-link" data-tab="offers"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/></svg> Buyer Offers</button>
-      <button type="button" class="side-link" data-tab="advisor"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.6 4.7L18 9l-4.4 1.3L12 15l-1.6-4.7L6 9l4.4-1.3L12 3z"/></svg> AI Advisor</button>
+      <a href="advisor.html" class="side-link"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.6 4.7L18 9l-4.4 1.3L12 15l-1.6-4.7L6 9l4.4-1.3L12 3z"/></svg> AI Advisor</a>
     </nav>
     <div class="side-foot">
       <a href="index.html" class="back-link">← Back to site</a>
@@ -319,17 +313,6 @@
         </div>
       </section>
 
-      <!-- ADVISOR TAB -->
-      <section id="tab-advisor" data-tabpanel hidden>
-        <div class="panel">
-          <div class="panel-head"><div><h3>AI Advisor</h3><p class="sub">Ask about pricing, timing, or buyer offers</p></div></div>
-          <div class="advisor-log" id="advisorLog"></div>
-          <div class="advisor-input-row">
-            <input type="text" id="advisorInput" placeholder="e.g. Should I sell my wheat now or wait?">
-            <button type="button" class="btn btn-solid" id="advisorSend">Ask</button>
-          </div>
-        </div>
-      </section>
     </main>
   </div>
 </div>
@@ -338,7 +321,7 @@
   <button type="button" class="active" data-tab="overview"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Overview</button>
   <button type="button" data-tab="prices"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg>Prices</button>
   <button type="button" data-tab="offers"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/></svg>Offers</button>
-  <button type="button" data-tab="advisor"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.6 4.7L18 9l-4.4 1.3L12 15l-1.6-4.7L6 9l4.4-1.3L12 3z"/></svg>Advisor</button>
+  <a href="advisor.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.6 4.7L18 9l-4.4 1.3L12 15l-1.6-4.7L6 9l4.4-1.3L12 3z"/></svg>Advisor</a>
 </nav>
 
 <script>
@@ -472,7 +455,6 @@
 
     await loadLots();
     await loadOffers();
-    renderAdvisorLog();
   }
 
   async function loadLots() {
@@ -614,7 +596,7 @@
   });
 
   /* ---------- tabs ---------- */
-  var tabTitles = { overview: "Overview", produce: "Overview", prices: "Market Prices", offers: "Buyer Offers", advisor: "AI Advisor" };
+  var tabTitles = { overview: "Overview", produce: "Overview", prices: "Market Prices", offers: "Buyer Offers" };
   function setTab(tab) {
     if (tab === "produce") tab = "overview";
     document.querySelectorAll("[data-tabpanel]").forEach(function (p) { p.hidden = p.id !== "tab-" + tab; });
@@ -625,36 +607,6 @@
   document.querySelectorAll(".side-link[data-tab], .mobile-tabbar button[data-tab]").forEach(function (b) {
     b.addEventListener("click", function () { setTab(b.getAttribute("data-tab")); });
   });
-
-  /* ---------- advisor ---------- */
-  var advisorMessages = [
-    { role: "bot", text: "Hi! I'm your AI Advisor. Ask me about mandi prices, the best time to sell, or a buyer's offer." }
-  ];
-  function renderAdvisorLog() {
-    var log = document.getElementById("advisorLog");
-    log.innerHTML = advisorMessages.map(function (m) {
-      return '<div class="advisor-msg ' + m.role + '">' + m.text + "</div>";
-    }).join("");
-    log.scrollTop = log.scrollHeight;
-  }
-  function advisorReply(q) {
-    var lower = q.toLowerCase();
-    if (lower.indexOf("wheat") !== -1) return "Wheat is up 1.8% this week in Indore mandi. Based on current arrivals, I'd hold 2–3 days for a likely further rise before selling.";
-    if (lower.indexOf("wait") !== -1 || lower.indexOf("now") !== -1) return "For most Grade A lots right now, holding 3–5 days shows a projected +3–5% net gain after storage cost — but if you need liquidity urgently, today's price is still fair.";
-    if (lower.indexOf("offer") !== -1 || lower.indexOf("buyer") !== -1) return "Compare the offer against the Net Realization Engine: subtract freight + mandi cess from the gross price. Anything within 2% of that number is a fair offer.";
-    return "Based on today's board, prices across your nearby mandis are broadly stable to slightly up. Add a produce lot above and I'll give a lot-specific recommendation.";
-  }
-  document.getElementById("advisorSend").addEventListener("click", sendAdvisorMsg);
-  document.getElementById("advisorInput").addEventListener("keydown", function (e) { if (e.key === "Enter") sendAdvisorMsg(); });
-  function sendAdvisorMsg() {
-    var input = document.getElementById("advisorInput");
-    var q = input.value.trim();
-    if (!q) return;
-    advisorMessages.push({ role: "user", text: q });
-    advisorMessages.push({ role: "bot", text: advisorReply(q) });
-    input.value = "";
-    renderAdvisorLog();
-  }
 
   /* ---------- boot ---------- */
   (async function boot() {

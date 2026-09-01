@@ -352,10 +352,10 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 00-3 3v6a3 3 0 006 0V5a3 3 0 00-3-3z"/><path d="M19 10v1a7 7 0 01-14 0v-1M12 18v4"/></svg>
         <span class="label">Voice Assistant</span>
       </button>
-      <button type="button" class="chip-btn chip-advisor" data-open-modal="advisor">
+      <a href="advisor.html" class="chip-btn chip-advisor">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.6 4.7L18 9l-4.4 1.3L12 15l-1.6-4.7L6 9l4.4-1.3L12 3z"/></svg>
         <span class="label">AI Advisor</span>
-      </button>
+      </a>
 
       <label class="lang-pick">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></svg>
@@ -399,7 +399,7 @@
   </nav>
   <div class="drawer-cta">
     <button type="button" class="chip-btn chip-voice" id="voiceBtnMobile" style="justify-content:center;">Voice Assistant</button>
-    <button type="button" class="chip-btn chip-advisor" data-open-modal="advisor" style="justify-content:center;">AI Advisor</button>
+    <a href="advisor.html" class="chip-btn chip-advisor" style="justify-content:center;">AI Advisor</a>
     <button type="button" class="btn btn-line" data-open-modal="signin">Sign in</button>
     <a href="dashboard.html" class="btn btn-solid">Enter Farmer Dashboard</a>
   </div>
@@ -754,13 +754,6 @@
       sub: "Strengthening Market Linkages & Price Discovery for Farmers",
       body: '<p>A Smart India Hackathon problem statement: farmers routinely sell below fair value because they lack visibility into multi-market prices, buyer demand and transport cost.</p>'
         + '<h4>What this prototype demonstrates</h4><ul><li>Real-time price comparison across mandis</li><li>AI-assisted best market / best time to sell</li><li>Verified buyer discovery &amp; digital offers</li><li>Logistics, delivery and escrow payment tracking in one ledger</li></ul>'
-    },
-    advisor: {
-      title: "AgriConnect AI Advisor",
-      sub: "Your personal net-realization assistant",
-      body: '<p>The AI Advisor reads today\'s mandi prices, your crop\'s quality grade, transport distance and storage cost, then tells you in plain language whether to sell today or wait.</p>'
-        + '<h4>Ask it things like</h4><ul><li>"Should I sell my wheat now or wait 3 days?"</li><li>"Which nearby mandi gives the best net price after transport?"</li><li>"Is this buyer\'s offer above the fair market rate?"</li></ul>'
-        + '<p class="form-note">Demo prototype — full conversational advisor ships with the production build.</p>'
     },
     docs: {
       title: "Documentation",
