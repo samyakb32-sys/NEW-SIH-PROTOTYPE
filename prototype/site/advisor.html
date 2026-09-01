@@ -186,6 +186,7 @@
       var data = await res.json();
       removeTyping();
       if (!res.ok) {
+        chatHistory.pop(); // drop the unanswered turn so it doesn't confuse the next message
         addMessage("assistant", data.error || "Something went wrong. Please try again.", true);
         return;
       }
@@ -193,6 +194,7 @@
       chatHistory.push({ role: "assistant", content: data.reply });
     } catch (err) {
       removeTyping();
+      chatHistory.pop();
       addMessage("assistant", "Could not reach the AI service: " + err.message, true);
     } finally {
       sendBtn.disabled = false;

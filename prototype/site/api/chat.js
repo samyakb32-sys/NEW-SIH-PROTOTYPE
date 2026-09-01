@@ -57,7 +57,11 @@ module.exports = async (req, res) => {
       body: JSON.stringify({
         contents: trimmed,
         systemInstruction: systemInstruction,
-        generationConfig: { temperature: 0.6, maxOutputTokens: 500 }
+        generationConfig: {
+          temperature: 0.6,
+          maxOutputTokens: 1024,
+          thinkingConfig: { thinkingBudget: 0 }
+        }
       })
     });
 
@@ -68,8 +72,17 @@ module.exports = async (req, res) => {
       return;
     }
     var candidate = data && data.candidates && data.candidates[0];
-    var reply = candidate && candidate.content && candidate.content.parts && candidate.content.parts[0] && candidate.content.parts[0].text;
-    res.status(200).json({ reply: reply || "Sorry, I couldn't generate a response just now." });
+    var parts = candidate && candidate.content && candidate.content.parts;
+    var reply = parts && parts.map(function (p) { return p.text || ""; }).join("").trim();
+    if (!reply) {
+      var reason = candidate && candidate.finishReason;
+      var fallback = reason === "MAX_TOKENS"
+        ? "That answer got cut off — try asking a shorter or more specific question."
+        : "Sorry, I couldn't generate a response just now.";
+      res.status(200).json({ reply: fallback });
+      return;
+    }
+    res.status(200).json({ reply: reply });
   } catch (err) {
     res.status(500).json({ error: "Could not reach Gemini: " + err.message });
   }
